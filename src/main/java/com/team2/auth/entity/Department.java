@@ -1,0 +1,35 @@
+package com.team2.auth.entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "departments")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "department_id")
+    private Integer id;
+
+    @Column(name = "department_name", nullable = false, length = 100)
+    private String name;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    public Department(String name) {
+        this.name = name;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+}
