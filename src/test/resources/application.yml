@@ -10,9 +10,18 @@ spring:
       ddl-auto: create-drop
     show-sql: true
 
+  sql:
+    init:
+      mode: never
+
   mail:
     host: localhost
     port: 25
+
+jwt:
+  secret: testSecretKeyForJwtTestingPurposesMustBe256BitsLongEnough!!
+  access-token-expiry: 10800000
+  refresh-token-expiry: 604800000
 
 server:
   port: 0
