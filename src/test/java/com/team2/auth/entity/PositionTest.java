@@ -19,6 +19,20 @@ class PositionTest {
     }
 
     @Test
+    @DisplayName("직급 생성 실패: 이름이 null이면 예외가 발생한다.")
+    void createPositionNameIsNullThrowsException() {
+        // given & when & then
+        assertThrows(IllegalArgumentException.class, () -> new Position(null, 1));
+    }
+
+    @Test
+    @DisplayName("직급 생성 실패: 이름이 공백이면 예외가 발생한다.")
+    void createPositionNameIsBlankThrowsException() {
+        // given & when & then
+        assertThrows(IllegalArgumentException.class, () -> new Position(" ", 1));
+    }
+
+    @Test
     @DisplayName("결재 권한 확인: level=1이면 결재 권한을 보유한다.")
     void hasApprovalAuthority_Level1_ReturnsTrue() {
         // given

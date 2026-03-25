@@ -28,6 +28,9 @@ public class Position {
     private LocalDateTime createdAt;
 
     public Position(String name, int level) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("직급명은 필수입니다.");
+        }
         this.name = name;
         this.level = level;
     }
