@@ -20,22 +20,22 @@ class PositionRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        positionRepository.save(new Position("사원", 5));
-        positionRepository.save(new Position("대리", 4));
+        positionRepository.save(new Position("팀장", 1));
+        positionRepository.save(new Position("팀원", 2));
     }
 
     @Test
     @DisplayName("직급명으로 직급을 조회할 수 있다")
     void findByName() {
         // given
-        String name = "사원";
+        String name = "팀장";
 
         // when
         Optional<Position> result = positionRepository.findByName(name);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getLevel()).isEqualTo(5);
+        assertThat(result.get().getLevel()).isEqualTo(1);
     }
 
     @Test

@@ -197,4 +197,77 @@ class UserTest {
         // when & then
         assertFalse(user.isAdmin());
     }
+
+    // === 정보 수정 ===
+
+    @Test
+    @DisplayName("정보 수정: name이 null이면 기존 이름을 유지한다.")
+    void updateInfo_withNullName_keepsOriginalName() {
+        // given
+        User user = createDefaultUser();
+
+        // when
+        user.updateInfo(null, "new@email.com");
+
+        // then
+        assertEquals("홍길동", user.getName());
+        assertEquals("new@email.com", user.getEmail());
+    }
+
+    @Test
+    @DisplayName("정보 수정: email이 null이면 기존 이메일을 유지한다.")
+    void updateInfo_withNullEmail_keepsOriginalEmail() {
+        // given
+        User user = createDefaultUser();
+
+        // when
+        user.updateInfo("newName", null);
+
+        // then
+        assertEquals("newName", user.getName());
+        assertEquals("hong@test.com", user.getEmail());
+    }
+
+    @Test
+    @DisplayName("정보 수정: 두 값 모두 전달하면 모두 변경된다.")
+    void updateInfo_withBothValues_updatesBoth() {
+        // given
+        User user = createDefaultUser();
+
+        // when
+        user.updateInfo("newName", "new@email.com");
+
+        // then
+        assertEquals("newName", user.getName());
+        assertEquals("new@email.com", user.getEmail());
+    }
+
+    // === 결재 권한 (추가) ===
+
+    @Test
+    @DisplayName("결재 권한 확인: level이 1이 아닌 직급이면 결재 권한이 없다.")
+    void hasApprovalAuthority_withNonLevel1Position_returnsFalse() {
+        // given
+        User user = createDefaultUser();
+        Position position = new Position("팀원", 2);
+        user.assignPosition(position);
+
+        // when & then
+        assertFalse(user.hasApprovalAuthority());
+    }
+
+    // === 상태 변경 (추가) ===
+
+    @Test
+    @DisplayName("상태 변경 성공: 재직에서 퇴직으로 변경된다.")
+    void changeStatus_fromActiveToRetired_success() {
+        // given
+        User user = createDefaultUser();
+
+        // when
+        user.changeStatus(UserStatus.퇴직);
+
+        // then
+        assertEquals(UserStatus.퇴직, user.getStatus());
+    }
 }

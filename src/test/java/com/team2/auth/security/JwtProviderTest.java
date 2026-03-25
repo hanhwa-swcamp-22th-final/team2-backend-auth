@@ -118,4 +118,14 @@ class JwtProviderTest {
         // then
         assertThat(result).isFalse();
     }
+
+    @Test
+    @DisplayName("RefreshToken 만료 시간을 반환한다")
+    void getRefreshTokenExpiry_returnsConfiguredValue() {
+        // when
+        long expiry = jwtProvider.getRefreshTokenExpiry();
+
+        // then
+        assertThat(expiry).isEqualTo(REFRESH_TOKEN_EXPIRY);
+    }
 }

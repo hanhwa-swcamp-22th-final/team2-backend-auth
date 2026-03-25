@@ -189,4 +189,16 @@ class AuthServiceTest {
         // then
         verify(refreshTokenRepository).deleteByUser(activeUser);
     }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자로 로그아웃 시 예외가 발생한다")
+    void logout_userNotFound() {
+        // given
+        given(userRepository.findById(999)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> authService.logout(999))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("사용자를 찾을 수 없습니다");
+    }
 }

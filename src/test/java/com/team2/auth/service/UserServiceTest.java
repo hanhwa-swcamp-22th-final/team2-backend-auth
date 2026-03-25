@@ -160,7 +160,7 @@ class UserServiceTest {
                 .positionId(1)
                 .build();
         Department department = new Department("영업부");
-        Position position = new Position("대리", 4);
+        Position position = new Position("팀원", 2);
         given(userRepository.findById(1)).willReturn(Optional.of(user));
         given(departmentRepository.findById(1)).willReturn(Optional.of(department));
         given(positionRepository.findById(1)).willReturn(Optional.of(position));
@@ -217,5 +217,87 @@ class UserServiceTest {
 
         // then
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("departmentId가 null이면 부서 배정을 건너뛴다")
+    void updateUser_nullDepartmentId() {
+        // given
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .name("김길동")
+                .email("kim@test.com")
+                .departmentId(null)
+                .positionId(1)
+                .build();
+        Position position = new Position("팀원", 2);
+        given(userRepository.findById(1)).willReturn(Optional.of(user));
+        given(positionRepository.findById(1)).willReturn(Optional.of(position));
+
+        // when
+        User result = userService.updateUser(1, request);
+
+        // then
+        assertThat(result.getName()).isEqualTo("김길동");
+        assertThat(result.getEmail()).isEqualTo("kim@test.com");
+    }
+
+    @Test
+    @DisplayName("positionId가 null이면 직급 배정을 건너뛴다")
+    void updateUser_nullPositionId() {
+        // given
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .name("김길동")
+                .email("kim@test.com")
+                .departmentId(1)
+                .positionId(null)
+                .build();
+        Department department = new Department("영업부");
+        given(userRepository.findById(1)).willReturn(Optional.of(user));
+        given(departmentRepository.findById(1)).willReturn(Optional.of(department));
+
+        // when
+        User result = userService.updateUser(1, request);
+
+        // then
+        assertThat(result.getName()).isEqualTo("김길동");
+        assertThat(result.getEmail()).isEqualTo("kim@test.com");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 부서 ID로 수정 시 예외가 발생한다")
+    void updateUser_departmentNotFound() {
+        // given
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .name("김길동")
+                .email("kim@test.com")
+                .departmentId(999)
+                .positionId(null)
+                .build();
+        given(userRepository.findById(1)).willReturn(Optional.of(user));
+        given(departmentRepository.findById(999)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.updateUser(1, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("부서를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 직급 ID로 수정 시 예외가 발생한다")
+    void updateUser_positionNotFound() {
+        // given
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .name("김길동")
+                .email("kim@test.com")
+                .departmentId(null)
+                .positionId(999)
+                .build();
+        given(userRepository.findById(1)).willReturn(Optional.of(user));
+        given(positionRepository.findById(999)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.updateUser(1, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("직급을 찾을 수 없습니다");
     }
 }

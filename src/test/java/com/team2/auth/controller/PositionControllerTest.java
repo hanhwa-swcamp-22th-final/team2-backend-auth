@@ -39,8 +39,8 @@ class PositionControllerTest {
     @DisplayName("POST /api/positions - 직급 생성 성공")
     void createPosition_success() throws Exception {
         // given
-        CreatePositionRequest request = new CreatePositionRequest("사원", 5);
-        given(positionService.createPosition("사원", 5)).willReturn(new Position("사원", 5));
+        CreatePositionRequest request = new CreatePositionRequest("팀원", 2);
+        given(positionService.createPosition("팀원", 2)).willReturn(new Position("팀원", 2));
 
         // when & then
         mockMvc.perform(post("/api/positions")
@@ -48,8 +48,8 @@ class PositionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("사원"))
-                .andExpect(jsonPath("$.level").value(5));
+                .andExpect(jsonPath("$.name").value("팀원"))
+                .andExpect(jsonPath("$.level").value(2));
     }
 
     @Test
@@ -57,14 +57,14 @@ class PositionControllerTest {
     void getAllPositions_success() throws Exception {
         // given
         given(positionService.getAllPositions()).willReturn(List.of(
-                new Position("사원", 5),
-                new Position("대리", 4)
+                new Position("팀장", 1),
+                new Position("팀원", 2)
         ));
 
         // when & then
         mockMvc.perform(get("/api/positions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("사원"))
-                .andExpect(jsonPath("$[1].name").value("대리"));
+                .andExpect(jsonPath("$[0].name").value("팀장"))
+                .andExpect(jsonPath("$[1].name").value("팀원"));
     }
 }

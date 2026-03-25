@@ -29,15 +29,15 @@ class PositionServiceTest {
     @DisplayName("직급을 생성할 수 있다")
     void createPosition_success() {
         // given
-        Position position = new Position("사원", 5);
+        Position position = new Position("팀원", 2);
         given(positionRepository.save(any(Position.class))).willReturn(position);
 
         // when
-        Position result = positionService.createPosition("사원", 5);
+        Position result = positionService.createPosition("팀원", 2);
 
         // then
-        assertThat(result.getName()).isEqualTo("사원");
-        assertThat(result.getLevel()).isEqualTo(5);
+        assertThat(result.getName()).isEqualTo("팀원");
+        assertThat(result.getLevel()).isEqualTo(2);
         verify(positionRepository).save(any(Position.class));
     }
 
@@ -46,8 +46,8 @@ class PositionServiceTest {
     void getAllPositions() {
         // given
         given(positionRepository.findAll()).willReturn(List.of(
-                new Position("사원", 5),
-                new Position("대리", 4)
+                new Position("팀원", 2),
+                new Position("팀장", 1)
         ));
 
         // when

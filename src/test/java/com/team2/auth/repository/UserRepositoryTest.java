@@ -35,7 +35,7 @@ class UserRepositoryTest {
     @BeforeEach
     void setUp() {
         savedDepartment = departmentRepository.save(new Department("영업부"));
-        Position position = positionRepository.save(new Position("사원", 5));
+        Position position = positionRepository.save(new Position("팀원", 2));
 
         User user = User.builder()
                 .employeeNo("EMP001")
@@ -139,5 +139,43 @@ class UserRepositoryTest {
         // then
         assertThat(salesUsers).hasSize(2);
         assertThat(prodUsers).isEmpty();
+    }
+
+    @Test
+    @DisplayName("상태로 사용자 목록을 조회할 수 있다")
+    void findByStatus() {
+        // given
+        User retiredUser = User.builder()
+                .employeeNo("EMP003")
+                .name("이영희")
+                .email("lee@test.com")
+                .pw("encodedPassword")
+                .role(Role.SALES)
+                .status(UserStatus.퇴직)
+                .build();
+        userRepository.save(retiredUser);
+
+        // when
+        List<User> activeUsers = userRepository.findByStatus(UserStatus.재직);
+        List<User> retiredUsers = userRepository.findByStatus(UserStatus.퇴직);
+
+        // then
+        assertThat(activeUsers).hasSize(1);
+        assertThat(retiredUsers).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("사용자 정보 수정 시 updatedAt이 갱신된다")
+    void updateUser_updatesTimestamp() {
+        // given
+        savedUser.updateInfo("김길동", "kim@test.com");
+
+        // when
+        userRepository.saveAndFlush(savedUser);
+        User updated = userRepository.findById(savedUser.getId()).orElseThrow();
+
+        // then
+        assertThat(updated.getUpdatedAt()).isNotNull();
+        assertThat(updated.getName()).isEqualTo("김길동");
     }
 }
