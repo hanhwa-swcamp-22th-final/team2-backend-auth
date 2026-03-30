@@ -53,8 +53,7 @@ class DepartmentServiceTest {
         // given
         given(departmentRepository.findAll()).willReturn(List.of(
                 new Department("영업부"),
-                new Department("생산부")
-        ));
+                new Department("생산부")));
 
         // when
         List<Department> result = departmentService.getAllDepartments();
@@ -92,8 +91,7 @@ class DepartmentServiceTest {
                         .pw("pw")
                         .role(com.team2.auth.entity.enums.Role.SALES)
                         .status(com.team2.auth.entity.enums.UserStatus.재직)
-                        .build()
-        ));
+                        .build()));
 
         // when & then
         assertThatThrownBy(() -> departmentService.deleteDepartment(1))

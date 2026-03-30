@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RefreshTokenTest {
 
+    // 빌더 패턴으로 적용
+
     @Test
     @DisplayName("리프레시 토큰 생성 성공: 토큰값과 만료시각이 설정된다.")
     void createRefreshToken_Success() {

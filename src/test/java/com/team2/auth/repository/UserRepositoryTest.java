@@ -165,6 +165,27 @@ class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("사용자 저장 시 createdAt과 updatedAt이 자동 설정된다")
+    void saveUser_setsCreatedAtAndUpdatedAt() {
+        // given
+        User newUser = User.builder()
+                .employeeNo("EMP099")
+                .name("prePersist 테스트")
+                .email("prepersist@test.com")
+                .pw("encodedPassword")
+                .role(Role.SALES)
+                .status(UserStatus.재직)
+                .build();
+
+        // when
+        User saved = userRepository.saveAndFlush(newUser);
+
+        // then
+        assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
     @DisplayName("사용자 정보 수정 시 updatedAt이 갱신된다")
     void updateUser_updatesTimestamp() {
         // given

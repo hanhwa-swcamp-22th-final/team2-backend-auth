@@ -1,5 +1,7 @@
 package com.team2.auth.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -127,5 +130,94 @@ class JwtProviderTest {
 
         // then
         assertThat(expiry).isEqualTo(REFRESH_TOKEN_EXPIRY);
+    }
+
+    // ========================================================================
+    // JWT 구조 및 JSON Payload 검증
+    // ========================================================================
+
+    @Test
+    @DisplayName("AccessToken은 3개의 dot으로 구분된 JWT 구조이다")
+    void generateAccessToken_hasThreePartStructure() {
+        // when
+        String token = jwtProvider.generateAccessToken(testUser);
+
+        // then
+        String[] parts = token.split("\\.");
+        assertThat(parts).hasSize(3);
+        assertThat(parts[0]).isNotBlank(); // header
+        assertThat(parts[1]).isNotBlank(); // payload
+        assertThat(parts[2]).isNotBlank(); // signature
+    }
+
+    @Test
+    @DisplayName("JWT header에 alg 필드가 존재하고 HMAC-SHA 계열 알고리즘이다")
+    void generateAccessToken_headerContainsHmacShaAlgorithm() throws Exception {
+        // given
+        String token = jwtProvider.generateAccessToken(testUser);
+        String headerJson = new String(Base64.getUrlDecoder().decode(token.split("\\.")[0]));
+        ObjectMapper mapper = new ObjectMapper();
+
+        // when
+        JsonNode header = mapper.readTree(headerJson);
+
+        // then
+        assertThat(header.has("alg")).isTrue();
+        assertThat(header.get("alg").asText()).startsWith("HS");
+    }
+
+    @Test
+    @DisplayName("JWT payload에 sub, email, name, role 클레임이 올바른 값으로 존재한다")
+    void generateAccessToken_payloadContainsCorrectClaims() throws Exception {
+        // given
+        String token = jwtProvider.generateAccessToken(testUser);
+        String payloadJson = new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]));
+        ObjectMapper mapper = new ObjectMapper();
+
+        // when
+        JsonNode payload = mapper.readTree(payloadJson);
+
+        // then
+        assertThat(payload.get("sub").asText()).isEqualTo("1");
+        assertThat(payload.get("email").asText()).isEqualTo("hong@test.com");
+        assertThat(payload.get("name").asText()).isEqualTo("홍길동");
+        assertThat(payload.get("role").asText()).isEqualTo("SALES");
+        assertThat(payload.has("iat")).isTrue();
+        assertThat(payload.has("exp")).isTrue();
+    }
+
+    @Test
+    @DisplayName("다른 시크릿 키로 서명된 토큰은 검증에 실패한다")
+    void validateAccessToken_withDifferentSecret_returnsFalse() {
+        // given
+        JwtProvider otherProvider = new JwtProvider(
+                "completelyDifferentSecretKeyThatIsLongEnoughForHS256!!", ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY);
+        String tokenFromOther = otherProvider.generateAccessToken(testUser);
+
+        // when
+        boolean result = jwtProvider.validateAccessToken(tokenFromOther);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("null 토큰 검증 시 false를 반환한다")
+    void validateAccessToken_withNull_returnsFalse() {
+        // when
+        boolean result = jwtProvider.validateAccessToken(null);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("빈 문자열 토큰 검증 시 false를 반환한다")
+    void validateAccessToken_withEmptyString_returnsFalse() {
+        // when
+        boolean result = jwtProvider.validateAccessToken("");
+
+        // then
+        assertThat(result).isFalse();
     }
 }

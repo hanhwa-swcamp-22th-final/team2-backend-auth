@@ -39,6 +39,19 @@ class DepartmentRepositoryTest {
     }
 
     @Test
+    @DisplayName("부서 저장 시 createdAt이 자동 설정된다")
+    void saveDepartment_setsCreatedAt() {
+        // given
+        Department dept = new Department("인사부");
+
+        // when
+        Department saved = departmentRepository.saveAndFlush(dept);
+
+        // then
+        assertThat(saved.getCreatedAt()).isNotNull();
+    }
+
+    @Test
     @DisplayName("존재하지 않는 부서명으로 조회하면 빈 Optional을 반환한다")
     void findByName_notFound() {
         // given

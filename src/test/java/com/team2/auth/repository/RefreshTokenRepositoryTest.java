@@ -83,6 +83,23 @@ class RefreshTokenRepositoryTest {
     }
 
     @Test
+    @DisplayName("리프레시 토큰 저장 시 createdAt이 자동 설정된다")
+    void saveRefreshToken_setsCreatedAt() {
+        // given
+        RefreshToken token = RefreshToken.builder()
+                .user(savedUser)
+                .token("created-at-test-token")
+                .expiresAt(LocalDateTime.now().plusDays(7))
+                .build();
+
+        // when
+        RefreshToken saved = refreshTokenRepository.saveAndFlush(token);
+
+        // then
+        assertThat(saved.getCreatedAt()).isNotNull();
+    }
+
+    @Test
     @DisplayName("사용자의 리프레시 토큰을 삭제할 수 있다")
     void deleteByUser() {
         // given

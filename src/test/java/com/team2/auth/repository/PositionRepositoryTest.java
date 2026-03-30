@@ -39,6 +39,19 @@ class PositionRepositoryTest {
     }
 
     @Test
+    @DisplayName("직급 저장 시 createdAt이 자동 설정된다")
+    void savePosition_setsCreatedAt() {
+        // given
+        Position position = new Position("사원", 3);
+
+        // when
+        Position saved = positionRepository.saveAndFlush(position);
+
+        // then
+        assertThat(saved.getCreatedAt()).isNotNull();
+    }
+
+    @Test
     @DisplayName("존재하지 않는 직급명으로 조회하면 빈 Optional을 반환한다")
     void findByName_notFound() {
         // given
