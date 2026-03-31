@@ -1,11 +1,25 @@
 package com.team2.auth.entity;
 
+import com.team2.auth.repository.PositionRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
+@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
 class PositionTest {
+
+    @Autowired
+    private PositionRepository positionRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("직급 생성 성공: 이름과 레벨이 정상 설정된다.")
@@ -13,9 +27,20 @@ class PositionTest {
         // given & when
         Position position = new Position("팀장", 1);
 
-        // then
+        // then - 도메인 로직 검증
         assertEquals("팀장", position.getName());
         assertEquals(1, position.getLevel());
+
+        // DB 저장 후 재조회 검증
+        positionRepository.save(position);
+        entityManager.flush();
+        entityManager.clear();
+
+        Position found = positionRepository.findById(position.getId()).orElseThrow();
+        assertEquals("팀장", found.getName());
+        assertEquals(1, found.getLevel());
+        // @PrePersist로 createdAt 자동설정 확인
+        assertNotNull(found.getCreatedAt());
     }
 
     @Test
@@ -40,6 +65,14 @@ class PositionTest {
 
         // when & then
         assertTrue(position.hasApprovalAuthority());
+
+        // DB 저장 후 재조회 검증
+        positionRepository.save(position);
+        entityManager.flush();
+        entityManager.clear();
+
+        Position found = positionRepository.findById(position.getId()).orElseThrow();
+        assertTrue(found.hasApprovalAuthority());
     }
 
     @Test
@@ -50,5 +83,13 @@ class PositionTest {
 
         // when & then
         assertFalse(position.hasApprovalAuthority());
+
+        // DB 저장 후 재조회 검증
+        positionRepository.save(position);
+        entityManager.flush();
+        entityManager.clear();
+
+        Position found = positionRepository.findById(position.getId()).orElseThrow();
+        assertFalse(found.hasApprovalAuthority());
     }
 }

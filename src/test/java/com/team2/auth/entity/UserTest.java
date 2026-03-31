@@ -2,12 +2,34 @@ package com.team2.auth.entity;
 
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
+import com.team2.auth.repository.DepartmentRepository;
+import com.team2.auth.repository.PositionRepository;
+import com.team2.auth.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
+@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
 class UserTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private PositionRepository positionRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private User createDefaultUser() {
         return User.builder()
@@ -20,6 +42,13 @@ class UserTest {
                 .build();
     }
 
+    private User saveAndReload(User user) {
+        userRepository.save(user);
+        entityManager.flush();
+        entityManager.clear();
+        return userRepository.findById(user.getId()).orElseThrow();
+    }
+
     // === 생성 테스트 ===
 
     @Test
@@ -28,12 +57,23 @@ class UserTest {
         // given & when
         User user = createDefaultUser();
 
-        // then
+        // then - 도메인 로직 검증
         assertEquals("EMP001", user.getEmployeeNo());
         assertEquals("홍길동", user.getName());
         assertEquals("hong@test.com", user.getEmail());
         assertEquals(Role.SALES, user.getRole());
         assertEquals(UserStatus.재직, user.getStatus());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals("EMP001", found.getEmployeeNo());
+        assertEquals("홍길동", found.getName());
+        assertEquals("hong@test.com", found.getEmail());
+        assertEquals(Role.SALES, found.getRole());
+        assertEquals(UserStatus.재직, found.getStatus());
+        // @PrePersist 검증
+        assertNotNull(found.getCreatedAt());
+        assertNotNull(found.getUpdatedAt());
     }
 
     // === 로그인 가능 여부 ===
@@ -46,6 +86,10 @@ class UserTest {
 
         // when & then
         assertTrue(user.canLogin());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertTrue(found.canLogin());
     }
 
     @Test
@@ -63,6 +107,10 @@ class UserTest {
 
         // when & then
         assertFalse(user.canLogin());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertFalse(found.canLogin());
     }
 
     @Test
@@ -80,6 +128,10 @@ class UserTest {
 
         // when & then
         assertFalse(user.canLogin());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertFalse(found.canLogin());
     }
 
     // === 상태 변경 ===
@@ -95,6 +147,10 @@ class UserTest {
 
         // then
         assertEquals(UserStatus.휴직, user.getStatus());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals(UserStatus.휴직, found.getStatus());
     }
 
     @Test
@@ -123,12 +179,17 @@ class UserTest {
         // given
         User user = createDefaultUser();
         Department department = new Department("영업1팀");
+        departmentRepository.save(department);
 
         // when
         user.assignDepartment(department);
 
         // then
         assertEquals(department, user.getDepartment());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals("영업1팀", found.getDepartment().getName());
     }
 
     @Test
@@ -137,12 +198,17 @@ class UserTest {
         // given
         User user = createDefaultUser();
         Position position = new Position("팀장", 1);
+        positionRepository.save(position);
 
         // when
         user.assignPosition(position);
 
         // then
         assertEquals(position, user.getPosition());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals("팀장", found.getPosition().getName());
     }
 
     // === 결재 권한 ===
@@ -153,10 +219,15 @@ class UserTest {
         // given
         User user = createDefaultUser();
         Position position = new Position("팀장", 1);
+        positionRepository.save(position);
         user.assignPosition(position);
 
         // when & then
         assertTrue(user.hasApprovalAuthority());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertTrue(found.hasApprovalAuthority());
     }
 
     @Test
@@ -167,6 +238,10 @@ class UserTest {
 
         // when & then
         assertFalse(user.hasApprovalAuthority());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertFalse(found.hasApprovalAuthority());
     }
 
     // === 관리자 확인 ===
@@ -186,6 +261,10 @@ class UserTest {
 
         // when & then
         assertTrue(user.isAdmin());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertTrue(found.isAdmin());
     }
 
     @Test
@@ -196,6 +275,10 @@ class UserTest {
 
         // when & then
         assertFalse(user.isAdmin());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertFalse(found.isAdmin());
     }
 
     // === 정보 수정 ===
@@ -205,13 +288,24 @@ class UserTest {
     void updateInfo_withNullName_keepsOriginalName() {
         // given
         User user = createDefaultUser();
+        userRepository.save(user);
+        entityManager.flush();
+        entityManager.clear();
 
         // when
-        user.updateInfo(null, "new@email.com");
+        User found = userRepository.findById(user.getId()).orElseThrow();
+        found.updateInfo(null, "new@email.com");
 
         // then
-        assertEquals("홍길동", user.getName());
-        assertEquals("new@email.com", user.getEmail());
+        assertEquals("홍길동", found.getName());
+        assertEquals("new@email.com", found.getEmail());
+
+        // DB 반영 후 재조회
+        entityManager.flush();
+        entityManager.clear();
+        User reloaded = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals("홍길동", reloaded.getName());
+        assertEquals("new@email.com", reloaded.getEmail());
     }
 
     @Test
@@ -219,13 +313,24 @@ class UserTest {
     void updateInfo_withNullEmail_keepsOriginalEmail() {
         // given
         User user = createDefaultUser();
+        userRepository.save(user);
+        entityManager.flush();
+        entityManager.clear();
 
         // when
-        user.updateInfo("newName", null);
+        User found = userRepository.findById(user.getId()).orElseThrow();
+        found.updateInfo("newName", null);
 
         // then
-        assertEquals("newName", user.getName());
-        assertEquals("hong@test.com", user.getEmail());
+        assertEquals("newName", found.getName());
+        assertEquals("hong@test.com", found.getEmail());
+
+        // DB 반영 후 재조회
+        entityManager.flush();
+        entityManager.clear();
+        User reloaded = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals("newName", reloaded.getName());
+        assertEquals("hong@test.com", reloaded.getEmail());
     }
 
     @Test
@@ -233,13 +338,24 @@ class UserTest {
     void updateInfo_withBothValues_updatesBoth() {
         // given
         User user = createDefaultUser();
+        userRepository.save(user);
+        entityManager.flush();
+        entityManager.clear();
 
         // when
-        user.updateInfo("newName", "new@email.com");
+        User found = userRepository.findById(user.getId()).orElseThrow();
+        found.updateInfo("newName", "new@email.com");
 
         // then
-        assertEquals("newName", user.getName());
-        assertEquals("new@email.com", user.getEmail());
+        assertEquals("newName", found.getName());
+        assertEquals("new@email.com", found.getEmail());
+
+        // DB 반영 후 재조회
+        entityManager.flush();
+        entityManager.clear();
+        User reloaded = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals("newName", reloaded.getName());
+        assertEquals("new@email.com", reloaded.getEmail());
     }
 
     // === 결재 권한 (추가) ===
@@ -250,10 +366,15 @@ class UserTest {
         // given
         User user = createDefaultUser();
         Position position = new Position("팀원", 2);
+        positionRepository.save(position);
         user.assignPosition(position);
 
         // when & then
         assertFalse(user.hasApprovalAuthority());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertFalse(found.hasApprovalAuthority());
     }
 
     // === 상태 변경 (추가) ===
@@ -269,5 +390,9 @@ class UserTest {
 
         // then
         assertEquals(UserStatus.퇴직, user.getStatus());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals(UserStatus.퇴직, found.getStatus());
     }
 }

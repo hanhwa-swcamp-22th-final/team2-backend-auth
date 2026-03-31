@@ -5,29 +5,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
+import com.team2.auth.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
+@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
+@DirtiesContext
+@Transactional
 class JwtProviderTest {
 
     private static final String SECRET = "testSecretKeyForJwtTestingPurposesMustBe256BitsLongEnough!!";
     private static final long ACCESS_TOKEN_EXPIRY = 3600000L;
     private static final long REFRESH_TOKEN_EXPIRY = 604800000L;
 
+    @Autowired
     private JwtProvider jwtProvider;
+
+    @Autowired
+    private UserRepository userRepository;
+
     private User testUser;
 
     @BeforeEach
-    void setUp() throws Exception {
-        jwtProvider = new JwtProvider(SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY);
-
+    void setUp() {
         testUser = User.builder()
                 .employeeNo("EMP001")
                 .name("홍길동")
@@ -36,10 +49,7 @@ class JwtProviderTest {
                 .role(Role.SALES)
                 .status(UserStatus.재직)
                 .build();
-
-        Field idField = User.class.getDeclaredField("id");
-        idField.setAccessible(true);
-        idField.set(testUser, 1);
+        testUser = userRepository.save(testUser);
     }
 
     @Test
@@ -62,7 +72,7 @@ class JwtProviderTest {
         Claims claims = jwtProvider.parseAccessToken(token);
 
         // then
-        assertThat(claims.getSubject()).isEqualTo("1");
+        assertThat(claims.getSubject()).isEqualTo(String.valueOf(testUser.getId()));
         assertThat(claims.get("email", String.class)).isEqualTo("hong@test.com");
         assertThat(claims.get("name", String.class)).isEqualTo("홍길동");
         assertThat(claims.get("role", String.class)).isEqualTo("SALES");
@@ -110,7 +120,7 @@ class JwtProviderTest {
     @Test
     @DisplayName("만료된 토큰 검증 시 false를 반환한다")
     void validateAccessToken_withExpiredToken_returnsFalse() throws InterruptedException {
-        // given
+        // given - 만료 토큰 테스트는 직접 JwtProvider 생성
         JwtProvider shortLivedProvider = new JwtProvider(SECRET, 1L, REFRESH_TOKEN_EXPIRY);
         String token = shortLivedProvider.generateAccessToken(testUser);
         Thread.sleep(50);
@@ -178,7 +188,7 @@ class JwtProviderTest {
         JsonNode payload = mapper.readTree(payloadJson);
 
         // then
-        assertThat(payload.get("sub").asText()).isEqualTo("1");
+        assertThat(payload.get("sub").asText()).isEqualTo(String.valueOf(testUser.getId()));
         assertThat(payload.get("email").asText()).isEqualTo("hong@test.com");
         assertThat(payload.get("name").asText()).isEqualTo("홍길동");
         assertThat(payload.get("role").asText()).isEqualTo("SALES");

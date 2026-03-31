@@ -3,67 +3,71 @@ package com.team2.auth.service;
 import com.team2.auth.dto.UpdateCompanyRequest;
 import com.team2.auth.entity.Company;
 import com.team2.auth.repository.CompanyRepository;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
+import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Transactional
 class CompanyServiceTest {
 
-    @Mock
+    @Autowired
+    private CompanyService companyService;
+
+    @Autowired
     private CompanyRepository companyRepository;
 
-    @InjectMocks
-    private CompanyService companyService;
+    @Autowired
+    private EntityManager entityManager;
+
+    @BeforeEach
+    void setUp() {
+        companyRepository.saveAndFlush(Company.builder()
+                .name("Team2 Corp")
+                .addressKr("서울시 강남구")
+                .addressEn("Gangnam, Seoul")
+                .tel("02-1234-5678")
+                .build());
+        entityManager.clear();
+    }
 
     @Test
     @DisplayName("회사 정보를 조회할 수 있다")
     void getCompany_success() {
-        // given
-        Company company = Company.builder()
-                .name("Team2 Corp")
-                .addressKr("서울시 강남구")
-                .build();
-        given(companyRepository.findTopByOrderByIdAsc()).willReturn(Optional.of(company));
-
-        // when
         Company result = companyService.getCompany();
 
-        // then
         assertThat(result.getName()).isEqualTo("Team2 Corp");
+        assertThat(result.getAddressKr()).isEqualTo("서울시 강남구");
     }
 
     @Test
     @DisplayName("회사 정보가 없으면 예외가 발생한다")
     void getCompany_notFound() {
-        // given
-        given(companyRepository.findTopByOrderByIdAsc()).willReturn(Optional.empty());
+        companyRepository.deleteAll();
+        entityManager.flush();
+        entityManager.clear();
 
-        // when & then
         assertThatThrownBy(() -> companyService.getCompany())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("회사 정보를 찾을 수 없습니다");
     }
 
     @Test
-    @DisplayName("회사 정보를 수정할 수 있다")
+    @DisplayName("회사 정보를 수정할 수 있다 (선택적 업데이트)")
     void updateCompany_success() {
         // given
-        Company company = Company.builder()
-                .name("Team2 Corp")
-                .addressKr("서울시 강남구")
-                .build();
-        given(companyRepository.findTopByOrderByIdAsc()).willReturn(Optional.of(company));
-
         UpdateCompanyRequest request = UpdateCompanyRequest.builder()
                 .name("Team2 Updated")
                 .tel("02-9999-8888")
@@ -71,9 +75,14 @@ class CompanyServiceTest {
 
         // when
         Company result = companyService.updateCompany(request);
+        entityManager.flush();
+        entityManager.clear();
 
-        // then
-        assertThat(result.getName()).isEqualTo("Team2 Updated");
-        assertThat(result.getTel()).isEqualTo("02-9999-8888");
+        // then - DB에서 다시 조회해서 확인
+        Company updated = companyRepository.findTopByOrderByIdAsc().orElseThrow();
+        assertThat(updated.getName()).isEqualTo("Team2 Updated");
+        assertThat(updated.getTel()).isEqualTo("02-9999-8888");
+        // null로 보낸 필드는 기존 값 유지
+        assertThat(updated.getAddressKr()).isEqualTo("서울시 강남구");
     }
 }
