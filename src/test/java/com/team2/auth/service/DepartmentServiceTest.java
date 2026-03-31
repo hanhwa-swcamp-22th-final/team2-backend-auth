@@ -1,6 +1,7 @@
 package com.team2.auth.service;
 
 import com.team2.auth.command.service.DepartmentCommandService;
+import com.team2.auth.query.service.DepartmentQueryService;
 import com.team2.auth.entity.Department;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
@@ -28,6 +29,9 @@ class DepartmentServiceTest {
 
     @Autowired
     private DepartmentCommandService departmentCommandService;
+
+    @Autowired
+    private DepartmentQueryService departmentQueryService;
 
     @Autowired
     private DepartmentRepository departmentRepository;
@@ -117,6 +121,46 @@ class DepartmentServiceTest {
     @DisplayName("존재하지 않는 부서 삭제 시 예외가 발생한다")
     void deleteDepartment_notFound() {
         assertThatThrownBy(() -> departmentCommandService.deleteDepartment(99999))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("부서를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("ID로 부서를 조회할 수 있다")
+    void getDepartment_success() {
+        Department saved = departmentCommandService.createDepartment("영업부");
+        entityManager.flush();
+        entityManager.clear();
+
+        Department result = departmentQueryService.getDepartment(saved.getDepartmentId());
+
+        assertThat(result.getDepartmentName()).isEqualTo("영업부");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 ID로 부서 조회 시 예외가 발생한다")
+    void getDepartment_notFound() {
+        assertThatThrownBy(() -> departmentQueryService.getDepartment(99999))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("부서를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("이름으로 부서를 조회할 수 있다")
+    void getDepartmentByName_success() {
+        departmentCommandService.createDepartment("영업부");
+        entityManager.flush();
+        entityManager.clear();
+
+        Department result = departmentQueryService.getDepartmentByName("영업부");
+
+        assertThat(result.getDepartmentName()).isEqualTo("영업부");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이름으로 부서 조회 시 예외가 발생한다")
+    void getDepartmentByName_notFound() {
+        assertThatThrownBy(() -> departmentQueryService.getDepartmentByName("없는부서"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("부서를 찾을 수 없습니다");
     }

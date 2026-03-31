@@ -1,6 +1,7 @@
 package com.team2.auth.service;
 
 import com.team2.auth.command.service.UserCommandService;
+import com.team2.auth.query.service.UserQueryService;
 import com.team2.auth.dto.CreateUserRequest;
 import com.team2.auth.dto.UpdateUserRequest;
 import com.team2.auth.entity.Department;
@@ -33,6 +34,9 @@ class UserServiceTest {
 
     @Autowired
     private UserCommandService userCommandService;
+
+    @Autowired
+    private UserQueryService userQueryService;
 
     @Autowired
     private UserRepository userRepository;
@@ -264,5 +268,17 @@ class UserServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("홍길동");
+    }
+
+    @Test
+    @DisplayName("상태별 사용자 목록을 조회할 수 있다")
+    void getUsersByStatus_success() {
+        entityManager.flush();
+        entityManager.clear();
+
+        List<User> activeUsers = userQueryService.getUsersByStatus(UserStatus.ACTIVE);
+
+        assertThat(activeUsers).hasSize(1);
+        assertThat(activeUsers.get(0).getUserName()).isEqualTo("홍길동");
     }
 }
