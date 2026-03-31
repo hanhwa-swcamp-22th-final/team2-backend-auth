@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team2.auth.mapper.CompanyQueryMapper">
+
+    <resultMap id="companyResultMap" type="com.team2.auth.entity.Company">
+        <id property="companyId" column="company_id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="companyAddressEn" column="company_address_en"/>
+        <result property="companyAddressKr" column="company_address_kr"/>
+        <result property="companyTel" column="company_tel"/>
+        <result property="companyFax" column="company_fax"/>
+        <result property="companyEmail" column="company_email"/>
+        <result property="companyWebsite" column="company_website"/>
+        <result property="companySealImageUrl" column="company_seal_image_url"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findFirst" resultMap="companyResultMap">
+        SELECT
+            company_id,
+            company_name,
+            company_address_en,
+            company_address_kr,
+            company_tel,
+            company_fax,
+            company_email,
+            company_website,
+            company_seal_image_url,
+            updated_at
+        FROM company
+        ORDER BY company_id ASC
+        LIMIT 1
+    </select>
+
+</mapper>

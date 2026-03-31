@@ -3,7 +3,8 @@ package com.team2.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.dto.CreateDepartmentRequest;
 import com.team2.auth.entity.Department;
-import com.team2.auth.service.DepartmentService;
+import com.team2.auth.service.DepartmentCommandService;
+import com.team2.auth.service.DepartmentQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +34,16 @@ class DepartmentControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private DepartmentService departmentService;
+    private DepartmentCommandService departmentCommandService;
+    @MockitoBean
+    private DepartmentQueryService departmentQueryService;
 
     @Test
     @DisplayName("POST /api/departments - 부서 생성 성공")
     void createDepartment_success() throws Exception {
         // given
         CreateDepartmentRequest request = new CreateDepartmentRequest("영업부");
-        given(departmentService.createDepartment("영업부")).willReturn(new Department("영업부"));
+        given(departmentCommandService.createDepartment("영업부")).willReturn(new Department("영업부"));
 
         // when & then
         mockMvc.perform(post("/api/departments")
@@ -55,7 +58,7 @@ class DepartmentControllerTest {
     @DisplayName("GET /api/departments - 전체 부서 목록 조회")
     void getAllDepartments_success() throws Exception {
         // given
-        given(departmentService.getAllDepartments()).willReturn(List.of(
+        given(departmentQueryService.getAllDepartments()).willReturn(List.of(
                 new Department("영업부"),
                 new Department("생산부")
         ));
@@ -75,6 +78,6 @@ class DepartmentControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        verify(departmentService).deleteDepartment(1);
+        verify(departmentCommandService).deleteDepartment(1);
     }
 }

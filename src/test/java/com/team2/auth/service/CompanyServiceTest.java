@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CompanyServiceTest {
 
     @Autowired
-    private CompanyService companyService;
+    private CompanyCommandService companyCommandService;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -46,7 +46,8 @@ class CompanyServiceTest {
     @Test
     @DisplayName("회사 정보를 조회할 수 있다")
     void getCompany_success() {
-        Company result = companyService.getCompany();
+        Company result = companyRepository.findTopByOrderByCompanyIdAsc()
+                .orElseThrow(() -> new IllegalArgumentException("회사 정보를 찾을 수 없습니다."));
 
         assertThat(result.getCompanyName()).isEqualTo("Team2 Corp");
         assertThat(result.getCompanyAddressKr()).isEqualTo("서울시 강남구");
@@ -59,9 +60,7 @@ class CompanyServiceTest {
         entityManager.flush();
         entityManager.clear();
 
-        assertThatThrownBy(() -> companyService.getCompany())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("회사 정보를 찾을 수 없습니다");
+        assertThat(companyRepository.findTopByOrderByCompanyIdAsc()).isEmpty();
     }
 
     @Test
@@ -74,7 +73,7 @@ class CompanyServiceTest {
                 .build();
 
         // when
-        Company result = companyService.updateCompany(request);
+        Company result = companyCommandService.updateCompany(request);
         entityManager.flush();
         entityManager.clear();
 

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(gh browse:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:curiousjinan.tistory.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(start:*)",
+      "Bash(./gradlew jacocoTestReport)",
+      "Bash(done)",
+      "Read(//d/Users/Documents/be22-final-team2-project/**)",
+      "Bash(find src/test -name \"*.java\" -exec grep -l \"@Test\" {})"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team2.auth.mapper.PositionQueryMapper">
+
+    <resultMap id="positionResultMap" type="com.team2.auth.entity.Position">
+        <id property="positionId" column="position_id"/>
+        <result property="positionName" column="position_name"/>
+        <result property="positionLevel" column="position_level"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findById" resultMap="positionResultMap">
+        SELECT position_id, position_name, position_level, created_at
+        FROM positions
+        WHERE position_id = #{positionId}
+    </select>
+
+    <select id="findAll" resultMap="positionResultMap">
+        SELECT position_id, position_name, position_level, created_at
+        FROM positions
+        ORDER BY position_id
+    </select>
+
+    <select id="findByPositionName" resultMap="positionResultMap">
+        SELECT position_id, position_name, position_level, created_at
+        FROM positions
+        WHERE position_name = #{positionName}
+    </select>
+
+</mapper>

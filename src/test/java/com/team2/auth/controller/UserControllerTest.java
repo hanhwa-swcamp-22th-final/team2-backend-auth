@@ -7,7 +7,8 @@ import com.team2.auth.dto.UpdateUserRequest;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.service.UserService;
+import com.team2.auth.service.UserCommandService;
+import com.team2.auth.service.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,9 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private UserService userService;
+    private UserCommandService userCommandService;
+    @MockitoBean
+    private UserQueryService userQueryService;
 
     private User createTestUser() {
         return User.builder()
@@ -62,7 +65,7 @@ class UserControllerTest {
                 .password("password123")
                 .role(Role.SALES)
                 .build();
-        given(userService.createUser(any(CreateUserRequest.class))).willReturn(createTestUser());
+        given(userCommandService.createUser(any(CreateUserRequest.class))).willReturn(createTestUser());
 
         // when & then
         mockMvc.perform(post("/api/users")
@@ -78,7 +81,7 @@ class UserControllerTest {
     @DisplayName("GET /api/users - 전체 사용자 목록 조회")
     void getAllUsers_success() throws Exception {
         // given
-        given(userService.getAllUsers()).willReturn(List.of(createTestUser()));
+        given(userQueryService.getAllUsers()).willReturn(List.of(createTestUser()));
 
         // when & then
         mockMvc.perform(get("/api/users"))
@@ -90,7 +93,7 @@ class UserControllerTest {
     @DisplayName("GET /api/users/{id} - 사용자 상세 조회")
     void getUser_success() throws Exception {
         // given
-        given(userService.getUser(1)).willReturn(createTestUser());
+        given(userQueryService.getUser(1)).willReturn(createTestUser());
 
         // when & then
         mockMvc.perform(get("/api/users/1"))
@@ -114,7 +117,7 @@ class UserControllerTest {
                 .userRole(Role.SALES)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
-        given(userService.updateUser(eq(1), any(UpdateUserRequest.class))).willReturn(updatedUser);
+        given(userCommandService.updateUser(eq(1), any(UpdateUserRequest.class))).willReturn(updatedUser);
 
         // when & then
         mockMvc.perform(put("/api/users/1")
@@ -138,7 +141,7 @@ class UserControllerTest {
                 .userRole(Role.SALES)
                 .userStatus(UserStatus.ON_LEAVE)
                 .build();
-        given(userService.changeStatus(eq(1), eq(UserStatus.ON_LEAVE))).willReturn(updatedUser);
+        given(userCommandService.changeStatus(eq(1), eq(UserStatus.ON_LEAVE))).willReturn(updatedUser);
 
         // when & then
         mockMvc.perform(patch("/api/users/1/status")

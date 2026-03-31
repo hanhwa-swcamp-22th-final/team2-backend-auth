@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class DepartmentServiceTest {
 
     @Autowired
-    private DepartmentService departmentService;
+    private DepartmentCommandService departmentCommandService;
 
     @Autowired
     private DepartmentRepository departmentRepository;
@@ -47,7 +47,7 @@ class DepartmentServiceTest {
     @DisplayName("부서를 생성할 수 있다")
     void createDepartment_success() {
         // when
-        Department result = departmentService.createDepartment("영업부");
+        Department result = departmentCommandService.createDepartment("영업부");
 
         // then
         assertThat(result.getDepartmentId()).isNotNull();
@@ -63,13 +63,13 @@ class DepartmentServiceTest {
     @DisplayName("전체 부서 목록을 조회할 수 있다")
     void getAllDepartments() {
         // given
-        departmentService.createDepartment("영업부");
-        departmentService.createDepartment("생산부");
+        departmentCommandService.createDepartment("영업부");
+        departmentCommandService.createDepartment("생산부");
         entityManager.flush();
         entityManager.clear();
 
         // when
-        List<Department> result = departmentService.getAllDepartments();
+        List<Department> result = departmentRepository.findAll();
 
         // then
         assertThat(result).hasSize(2);
@@ -79,12 +79,12 @@ class DepartmentServiceTest {
     @DisplayName("소속 사용자가 없는 부서를 삭제할 수 있다")
     void deleteDepartment_success() {
         // given
-        Department dept = departmentService.createDepartment("영업부");
+        Department dept = departmentCommandService.createDepartment("영업부");
         entityManager.flush();
         entityManager.clear();
 
         // when
-        departmentService.deleteDepartment(dept.getDepartmentId());
+        departmentCommandService.deleteDepartment(dept.getDepartmentId());
         entityManager.flush();
         entityManager.clear();
 
@@ -110,7 +110,7 @@ class DepartmentServiceTest {
         entityManager.clear();
 
         // when & then
-        assertThatThrownBy(() -> departmentService.deleteDepartment(dept.getDepartmentId()))
+        assertThatThrownBy(() -> departmentCommandService.deleteDepartment(dept.getDepartmentId()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("소속된 사용자가 있어 삭제할 수 없습니다");
     }
@@ -118,7 +118,7 @@ class DepartmentServiceTest {
     @Test
     @DisplayName("존재하지 않는 부서 삭제 시 예외가 발생한다")
     void deleteDepartment_notFound() {
-        assertThatThrownBy(() -> departmentService.deleteDepartment(99999))
+        assertThatThrownBy(() -> departmentCommandService.deleteDepartment(99999))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("부서를 찾을 수 없습니다");
     }

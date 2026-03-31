@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team2.auth.mapper.UserQueryMapper">
+
+    <resultMap id="departmentResultMap" type="com.team2.auth.entity.Department">
+        <id property="departmentId" column="department_id"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="createdAt" column="dept_created_at"/>
+    </resultMap>
+
+    <resultMap id="positionResultMap" type="com.team2.auth.entity.Position">
+        <id property="positionId" column="position_id"/>
+        <result property="positionName" column="position_name"/>
+        <result property="positionLevel" column="position_level"/>
+        <result property="createdAt" column="pos_created_at"/>
+    </resultMap>
+
+    <resultMap id="userResultMap" type="com.team2.auth.entity.User">
+        <id property="userId" column="user_id"/>
+        <result property="employeeNo" column="employee_no"/>
+        <result property="userName" column="user_name"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="userPw" column="user_pw"/>
+        <result property="userRole" column="user_role"/>
+        <result property="userStatus" column="user_status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <association property="department" resultMap="departmentResultMap"/>
+        <association property="position" resultMap="positionResultMap"/>
+    </resultMap>
+
+    <sql id="userColumns">
+        u.user_id,
+        u.employee_no,
+        u.user_name,
+        u.user_email,
+        u.user_pw,
+        u.user_role,
+        u.user_status,
+        u.created_at,
+        u.updated_at,
+        d.department_id,
+        d.department_name,
+        d.created_at AS dept_created_at,
+        p.position_id,
+        p.position_name,
+        p.position_level,
+        p.created_at AS pos_created_at
+    </sql>
+
+    <sql id="userJoins">
+        FROM users u
+        LEFT JOIN departments d ON u.department_id = d.department_id
+        LEFT JOIN positions p ON u.position_id = p.position_id
+    </sql>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.user_id = #{userId}
+    </select>
+
+    <select id="findByUserEmail" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.user_email = #{userEmail}
+    </select>
+
+    <select id="findByEmployeeNo" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.employee_no = #{employeeNo}
+    </select>
+
+    <select id="findAll" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        ORDER BY u.user_id
+    </select>
+
+    <select id="findByDepartmentId" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.department_id = #{departmentId}
+        ORDER BY u.user_id
+    </select>
+
+    <select id="findByUserStatus" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.user_status = #{userStatus}
+        ORDER BY u.user_id
+    </select>
+
+    <select id="existsByUserEmail" resultType="int">
+        SELECT COUNT(*) FROM users WHERE user_email = #{userEmail}
+    </select>
+
+    <select id="existsByEmployeeNo" resultType="int">
+        SELECT COUNT(*) FROM users WHERE employee_no = #{employeeNo}
+    </select>
+
+</mapper>

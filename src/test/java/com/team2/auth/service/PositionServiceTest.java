@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PositionServiceTest {
 
     @Autowired
-    private PositionService positionService;
+    private PositionCommandService positionCommandService;
 
     @Autowired
     private PositionRepository positionRepository;
@@ -35,7 +35,7 @@ class PositionServiceTest {
     @DisplayName("직급을 생성할 수 있다")
     void createPosition_success() {
         // when
-        Position result = positionService.createPosition("팀원", 2);
+        Position result = positionCommandService.createPosition("팀원", 2);
 
         // then
         assertThat(result.getPositionId()).isNotNull();
@@ -52,13 +52,13 @@ class PositionServiceTest {
     @DisplayName("전체 직급 목록을 조회할 수 있다")
     void getAllPositions() {
         // given
-        positionService.createPosition("팀장", 1);
-        positionService.createPosition("팀원", 2);
+        positionCommandService.createPosition("팀장", 1);
+        positionCommandService.createPosition("팀원", 2);
         entityManager.flush();
         entityManager.clear();
 
         // when
-        List<Position> result = positionService.getAllPositions();
+        List<Position> result = positionRepository.findAll();
 
         // then
         assertThat(result).hasSize(2);

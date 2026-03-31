@@ -3,7 +3,8 @@ package com.team2.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.dto.UpdateCompanyRequest;
 import com.team2.auth.entity.Company;
-import com.team2.auth.service.CompanyService;
+import com.team2.auth.service.CompanyCommandService;
+import com.team2.auth.service.CompanyQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,9 @@ class CompanyControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private CompanyService companyService;
+    private CompanyCommandService companyCommandService;
+    @MockitoBean
+    private CompanyQueryService companyQueryService;
 
     @Test
     @DisplayName("GET /api/company - 회사 정보 조회 성공")
@@ -43,7 +46,7 @@ class CompanyControllerTest {
                 .companyAddressKr("서울시 강남구")
                 .companyTel("02-1234-5678")
                 .build();
-        given(companyService.getCompany()).willReturn(company);
+        given(companyQueryService.getCompany()).willReturn(company);
 
         // when & then
         mockMvc.perform(get("/api/company"))
@@ -64,7 +67,7 @@ class CompanyControllerTest {
                 .companyName("Team2 Updated")
                 .companyTel("02-9999-8888")
                 .build();
-        given(companyService.updateCompany(any(UpdateCompanyRequest.class))).willReturn(updated);
+        given(companyCommandService.updateCompany(any(UpdateCompanyRequest.class))).willReturn(updated);
 
         // when & then
         mockMvc.perform(put("/api/company")

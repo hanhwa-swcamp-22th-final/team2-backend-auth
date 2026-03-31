@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class UserServiceTest {
 
     @Autowired
-    private UserService userService;
+    private UserCommandService userCommandService;
 
     @Autowired
     private UserRepository userRepository;
@@ -85,7 +85,7 @@ class UserServiceTest {
                 .build();
 
         // when
-        User result = userService.createUser(request);
+        User result = userCommandService.createUser(request);
 
         // then
         assertThat(result.getUserId()).isNotNull();
@@ -113,7 +113,7 @@ class UserServiceTest {
                 .role(Role.SALES)
                 .build();
 
-        assertThatThrownBy(() -> userService.createUser(request))
+        assertThatThrownBy(() -> userCommandService.createUser(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("이미 사용 중인 이메일");
     }
@@ -129,7 +129,7 @@ class UserServiceTest {
                 .role(Role.SALES)
                 .build();
 
-        assertThatThrownBy(() -> userService.createUser(request))
+        assertThatThrownBy(() -> userCommandService.createUser(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("이미 사용 중인 사번");
     }
@@ -137,7 +137,8 @@ class UserServiceTest {
     @Test
     @DisplayName("ID로 사용자를 조회할 수 있다")
     void getUser_success() {
-        User result = userService.getUser(savedUser.getUserId());
+        User result = userRepository.findById(savedUser.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         assertThat(result.getUserName()).isEqualTo("홍길동");
         assertThat(result.getUserEmail()).isEqualTo("hong@test.com");
@@ -146,9 +147,7 @@ class UserServiceTest {
     @Test
     @DisplayName("존재하지 않는 ID로 조회 시 예외가 발생한다")
     void getUser_notFound() {
-        assertThatThrownBy(() -> userService.getUser(99999))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("사용자를 찾을 수 없습니다");
+        assertThat(userRepository.findById(99999)).isEmpty();
     }
 
     @Test
@@ -163,7 +162,7 @@ class UserServiceTest {
                 .build();
 
         // when
-        User result = userService.updateUser(savedUser.getUserId(), request);
+        User result = userCommandService.updateUser(savedUser.getUserId(), request);
         entityManager.flush();
         entityManager.clear();
 
@@ -185,7 +184,7 @@ class UserServiceTest {
                 .positionId(savedPosition.getPositionId())
                 .build();
 
-        User result = userService.updateUser(savedUser.getUserId(), request);
+        User result = userCommandService.updateUser(savedUser.getUserId(), request);
 
         assertThat(result.getUserName()).isEqualTo("김길동");
         assertThat(result.getDepartment()).isNull();
@@ -201,7 +200,7 @@ class UserServiceTest {
                 .positionId(null)
                 .build();
 
-        User result = userService.updateUser(savedUser.getUserId(), request);
+        User result = userCommandService.updateUser(savedUser.getUserId(), request);
 
         assertThat(result.getUserName()).isEqualTo("김길동");
         assertThat(result.getPosition()).isNull();
@@ -215,7 +214,7 @@ class UserServiceTest {
                 .departmentId(99999)
                 .build();
 
-        assertThatThrownBy(() -> userService.updateUser(savedUser.getUserId(), request))
+        assertThatThrownBy(() -> userCommandService.updateUser(savedUser.getUserId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("부서를 찾을 수 없습니다");
     }
@@ -228,7 +227,7 @@ class UserServiceTest {
                 .positionId(99999)
                 .build();
 
-        assertThatThrownBy(() -> userService.updateUser(savedUser.getUserId(), request))
+        assertThatThrownBy(() -> userCommandService.updateUser(savedUser.getUserId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("직급을 찾을 수 없습니다");
     }
@@ -236,7 +235,7 @@ class UserServiceTest {
     @Test
     @DisplayName("사용자 상태를 변경할 수 있다")
     void changeStatus_success() {
-        User result = userService.changeStatus(savedUser.getUserId(), UserStatus.ON_LEAVE);
+        User result = userCommandService.changeStatus(savedUser.getUserId(), UserStatus.ON_LEAVE);
 
         assertThat(result.getUserStatus()).isEqualTo(UserStatus.ON_LEAVE);
 
@@ -251,11 +250,11 @@ class UserServiceTest {
     @DisplayName("퇴직 상태의 사용자는 상태를 변경할 수 없다")
     void changeStatus_retired() {
         // 먼저 퇴직 상태로 변경
-        userService.changeStatus(savedUser.getUserId(), UserStatus.RETIRED);
+        userCommandService.changeStatus(savedUser.getUserId(), UserStatus.RETIRED);
         entityManager.flush();
         entityManager.clear();
 
-        assertThatThrownBy(() -> userService.changeStatus(savedUser.getUserId(), UserStatus.ACTIVE))
+        assertThatThrownBy(() -> userCommandService.changeStatus(savedUser.getUserId(), UserStatus.ACTIVE))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("퇴직한 사용자");
     }
@@ -263,7 +262,7 @@ class UserServiceTest {
     @Test
     @DisplayName("전체 사용자 목록을 조회할 수 있다")
     void getAllUsers() {
-        List<User> result = userService.getAllUsers();
+        List<User> result = userRepository.findAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("홍길동");

@@ -6,30 +6,31 @@ import com.team2.auth.entity.Department;
 import com.team2.auth.entity.Position;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.UserStatus;
+import com.team2.auth.mapper.UserQueryMapper;
 import com.team2.auth.repository.DepartmentRepository;
 import com.team2.auth.repository.PositionRepository;
 import com.team2.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+@Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserService {
+@Transactional
+public class UserCommandService {
 
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final PositionRepository positionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserQueryMapper userQueryMapper;
 
-    @Transactional
     public User createUser(CreateUserRequest request) {
-        if (userRepository.existsByUserEmail(request.getEmail())) {
+        if (userQueryMapper.existsByUserEmail(request.getEmail()) > 0) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
-        if (userRepository.existsByEmployeeNo(request.getEmployeeNo())) {
+        if (userQueryMapper.existsByEmployeeNo(request.getEmployeeNo()) > 0) {
             throw new IllegalArgumentException("이미 사용 중인 사번입니다.");
         }
 
@@ -45,14 +46,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getUser(Integer id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-    }
-
-    @Transactional
     public User updateUser(Integer id, UpdateUserRequest request) {
-        User user = getUser(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         user.updateInfo(request.getName(), request.getEmail());
 
         if (request.getDepartmentId() != null) {
@@ -70,14 +66,10 @@ public class UserService {
         return user;
     }
 
-    @Transactional
     public User changeStatus(Integer id, UserStatus status) {
-        User user = getUser(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         user.changeStatus(status);
         return user;
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
     }
 }

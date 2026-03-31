@@ -2,7 +2,8 @@ package com.team2.auth.controller;
 
 import com.team2.auth.dto.CreatePositionRequest;
 import com.team2.auth.entity.Position;
-import com.team2.auth.service.PositionService;
+import com.team2.auth.service.PositionCommandService;
+import com.team2.auth.service.PositionQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +16,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PositionController {
 
-    private final PositionService positionService;
+    private final PositionCommandService positionCommandService;
+    private final PositionQueryService positionQueryService;
 
     @PostMapping
     public ResponseEntity<Position> createPosition(@RequestBody CreatePositionRequest request) {
-        Position position = positionService.createPosition(request.getName(), request.getLevel());
+        Position position = positionCommandService.createPosition(request.getName(), request.getLevel());
         return ResponseEntity.status(HttpStatus.CREATED).body(position);
     }
 
     @GetMapping
     public ResponseEntity<List<Position>> getAllPositions() {
-        return ResponseEntity.ok(positionService.getAllPositions());
+        return ResponseEntity.ok(positionQueryService.getAllPositions());
     }
 }

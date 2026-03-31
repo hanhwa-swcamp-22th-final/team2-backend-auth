@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team2.auth.mapper.RefreshTokenQueryMapper">
+
+    <resultMap id="userResultMap" type="com.team2.auth.entity.User">
+        <id property="userId" column="user_id"/>
+        <result property="employeeNo" column="employee_no"/>
+        <result property="userName" column="user_name"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="userPw" column="user_pw"/>
+        <result property="userRole" column="user_role"/>
+        <result property="userStatus" column="user_status"/>
+        <result property="createdAt" column="user_created_at"/>
+        <result property="updatedAt" column="user_updated_at"/>
+    </resultMap>
+
+    <resultMap id="refreshTokenResultMap" type="com.team2.auth.entity.RefreshToken">
+        <id property="refreshTokenId" column="refresh_token_id"/>
+        <result property="tokenValue" column="token_value"/>
+        <result property="tokenExpiresAt" column="token_expires_at"/>
+        <result property="createdAt" column="rt_created_at"/>
+        <association property="user" resultMap="userResultMap"/>
+    </resultMap>
+
+    <sql id="refreshTokenColumns">
+        rt.refresh_token_id,
+        rt.token_value,
+        rt.token_expires_at,
+        rt.created_at AS rt_created_at,
+        u.user_id,
+        u.employee_no,
+        u.user_name,
+        u.user_email,
+        u.user_pw,
+        u.user_role,
+        u.user_status,
+        u.created_at AS user_created_at,
+        u.updated_at AS user_updated_at
+    </sql>
+
+    <select id="findByTokenValue" resultMap="refreshTokenResultMap">
+        SELECT
+        <include refid="refreshTokenColumns"/>
+        FROM refresh_tokens rt
+        JOIN users u ON rt.user_id = u.user_id
+        WHERE rt.token_value = #{tokenValue}
+    </select>
+
+    <select id="findByUserId" resultMap="refreshTokenResultMap">
+        SELECT
+        <include refid="refreshTokenColumns"/>
+        FROM refresh_tokens rt
+        JOIN users u ON rt.user_id = u.user_id
+        WHERE rt.user_id = #{userId}
+    </select>
+
+</mapper>

@@ -3,6 +3,8 @@ package com.team2.auth.service;
 import com.team2.auth.dto.TokenResponse;
 import com.team2.auth.entity.RefreshToken;
 import com.team2.auth.entity.User;
+import com.team2.auth.mapper.RefreshTokenQueryMapper;
+import com.team2.auth.mapper.UserQueryMapper;
 import com.team2.auth.repository.RefreshTokenRepository;
 import com.team2.auth.repository.UserRepository;
 import com.team2.auth.security.JwtProvider;
@@ -16,18 +18,21 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final UserQueryMapper userQueryMapper;
+    private final RefreshTokenQueryMapper refreshTokenQueryMapper;
 
     @Transactional
     public TokenResponse login(String email, String password) {
-        User user = userRepository.findByUserEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        User user = userQueryMapper.findByUserEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        }
 
         if (!passwordEncoder.matches(password, user.getUserPw())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -55,8 +60,10 @@ public class AuthService {
 
     @Transactional
     public TokenResponse refreshToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByTokenValue(token)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
+        RefreshToken refreshToken = refreshTokenQueryMapper.findByTokenValue(token);
+        if (refreshToken == null) {
+            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        }
 
         if (refreshToken.isExpired()) {
             refreshTokenRepository.delete(refreshToken);

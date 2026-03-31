@@ -3,7 +3,8 @@ package com.team2.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.dto.CreatePositionRequest;
 import com.team2.auth.entity.Position;
-import com.team2.auth.service.PositionService;
+import com.team2.auth.service.PositionCommandService;
+import com.team2.auth.service.PositionQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +34,16 @@ class PositionControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PositionService positionService;
+    private PositionCommandService positionCommandService;
+    @MockitoBean
+    private PositionQueryService positionQueryService;
 
     @Test
     @DisplayName("POST /api/positions - 직급 생성 성공")
     void createPosition_success() throws Exception {
         // given
         CreatePositionRequest request = new CreatePositionRequest("팀원", 2);
-        given(positionService.createPosition("팀원", 2)).willReturn(new Position("팀원", 2));
+        given(positionCommandService.createPosition("팀원", 2)).willReturn(new Position("팀원", 2));
 
         // when & then
         mockMvc.perform(post("/api/positions")
@@ -56,7 +59,7 @@ class PositionControllerTest {
     @DisplayName("GET /api/positions - 전체 직급 목록 조회")
     void getAllPositions_success() throws Exception {
         // given
-        given(positionService.getAllPositions()).willReturn(List.of(
+        given(positionQueryService.getAllPositions()).willReturn(List.of(
                 new Position("팀장", 1),
                 new Position("팀원", 2)
         ));

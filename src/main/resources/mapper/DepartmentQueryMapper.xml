@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team2.auth.mapper.DepartmentQueryMapper">
+
+    <resultMap id="departmentResultMap" type="com.team2.auth.entity.Department">
+        <id property="departmentId" column="department_id"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findById" resultMap="departmentResultMap">
+        SELECT department_id, department_name, created_at
+        FROM departments
+        WHERE department_id = #{departmentId}
+    </select>
+
+    <select id="findAll" resultMap="departmentResultMap">
+        SELECT department_id, department_name, created_at
+        FROM departments
+        ORDER BY department_id
+    </select>
+
+    <select id="findByDepartmentName" resultMap="departmentResultMap">
+        SELECT department_id, department_name, created_at
+        FROM departments
+        WHERE department_name = #{departmentName}
+    </select>
+
+</mapper>
