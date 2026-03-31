@@ -5,15 +5,13 @@ import com.team2.auth.dto.*;
 import com.team2.auth.entity.*;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.repository.*;
+import com.team2.auth.command.repository.*;
 import com.team2.auth.security.JwtProvider;
-import com.team2.auth.service.*;
+import com.team2.auth.command.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -30,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
 class AuthIntegrationTest {

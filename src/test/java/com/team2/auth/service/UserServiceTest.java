@@ -1,5 +1,6 @@
 package com.team2.auth.service;
 
+import com.team2.auth.command.service.UserCommandService;
 import com.team2.auth.dto.CreateUserRequest;
 import com.team2.auth.dto.UpdateUserRequest;
 import com.team2.auth.entity.Department;
@@ -7,16 +8,14 @@ import com.team2.auth.entity.Position;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.repository.DepartmentRepository;
-import com.team2.auth.repository.PositionRepository;
-import com.team2.auth.repository.UserRepository;
+import com.team2.auth.command.repository.DepartmentRepository;
+import com.team2.auth.command.repository.PositionRepository;
+import com.team2.auth.command.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -28,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-@ImportAutoConfiguration(exclude = MybatisAutoConfiguration.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
 class UserServiceTest {

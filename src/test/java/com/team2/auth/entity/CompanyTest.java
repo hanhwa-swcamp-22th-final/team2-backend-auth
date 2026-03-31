@@ -1,6 +1,6 @@
 package com.team2.auth.entity;
 
-import com.team2.auth.repository.CompanyRepository;
+import com.team2.auth.command.repository.CompanyRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

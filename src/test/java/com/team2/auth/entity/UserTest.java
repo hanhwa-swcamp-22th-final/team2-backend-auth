@@ -2,9 +2,9 @@ package com.team2.auth.entity;
 
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.repository.DepartmentRepository;
-import com.team2.auth.repository.PositionRepository;
-import com.team2.auth.repository.UserRepository;
+import com.team2.auth.command.repository.DepartmentRepository;
+import com.team2.auth.command.repository.PositionRepository;
+import com.team2.auth.command.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

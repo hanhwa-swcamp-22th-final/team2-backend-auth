@@ -1,12 +1,13 @@
 package com.team2.auth.service;
 
+import com.team2.auth.command.service.AuthService;
 import com.team2.auth.dto.TokenResponse;
 import com.team2.auth.entity.RefreshToken;
 import com.team2.auth.entity.User;
 import com.team2.auth.entity.enums.Role;
 import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.repository.RefreshTokenRepository;
-import com.team2.auth.repository.UserRepository;
+import com.team2.auth.command.repository.RefreshTokenRepository;
+import com.team2.auth.command.repository.UserRepository;
 import com.team2.auth.security.JwtProvider;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,5 +1,8 @@
 package com.team2.auth.repository;
 
+import com.team2.auth.command.repository.DepartmentRepository;
+import com.team2.auth.command.repository.PositionRepository;
+import com.team2.auth.command.repository.UserRepository;
 import com.team2.auth.entity.Department;
 import com.team2.auth.entity.Position;
 import com.team2.auth.entity.User;

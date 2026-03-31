@@ -1,5 +1,6 @@
 package com.team2.auth.repository;
 
+import com.team2.auth.command.repository.DepartmentRepository;
 import com.team2.auth.entity.Department;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
