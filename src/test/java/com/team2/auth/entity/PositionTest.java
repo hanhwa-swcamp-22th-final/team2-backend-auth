@@ -28,17 +28,17 @@ class PositionTest {
         Position position = new Position("팀장", 1);
 
         // then - 도메인 로직 검증
-        assertEquals("팀장", position.getName());
-        assertEquals(1, position.getLevel());
+        assertEquals("팀장", position.getPositionName());
+        assertEquals(1, position.getPositionLevel());
 
         // DB 저장 후 재조회 검증
         positionRepository.save(position);
         entityManager.flush();
         entityManager.clear();
 
-        Position found = positionRepository.findById(position.getId()).orElseThrow();
-        assertEquals("팀장", found.getName());
-        assertEquals(1, found.getLevel());
+        Position found = positionRepository.findById(position.getPositionId()).orElseThrow();
+        assertEquals("팀장", found.getPositionName());
+        assertEquals(1, found.getPositionLevel());
         // @PrePersist로 createdAt 자동설정 확인
         assertNotNull(found.getCreatedAt());
     }
@@ -71,7 +71,7 @@ class PositionTest {
         entityManager.flush();
         entityManager.clear();
 
-        Position found = positionRepository.findById(position.getId()).orElseThrow();
+        Position found = positionRepository.findById(position.getPositionId()).orElseThrow();
         assertTrue(found.hasApprovalAuthority());
     }
 
@@ -89,7 +89,7 @@ class PositionTest {
         entityManager.flush();
         entityManager.clear();
 
-        Position found = positionRepository.findById(position.getId()).orElseThrow();
+        Position found = positionRepository.findById(position.getPositionId()).orElseThrow();
         assertFalse(found.hasApprovalAuthority());
     }
 }

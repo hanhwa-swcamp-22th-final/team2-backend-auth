@@ -16,27 +16,27 @@ public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "position_id")
-    private Integer id;
+    private Integer positionId;
 
     @Column(name = "position_name", nullable = false, length = 50)
-    private String name;
+    private String positionName;
 
     @Column(name = "position_level", nullable = false)
-    private int level;
+    private int positionLevel;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Position(String name, int level) {
-        if (name == null || name.isBlank()) {
+    public Position(String positionName, int positionLevel) {
+        if (positionName == null || positionName.isBlank()) {
             throw new IllegalArgumentException("직급명은 필수입니다.");
         }
-        this.name = name;
-        this.level = level;
+        this.positionName = positionName;
+        this.positionLevel = positionLevel;
     }
 
     public boolean hasApprovalAuthority() {
-        return this.level == 1;
+        return this.positionLevel == 1;
     }
 
     @PrePersist

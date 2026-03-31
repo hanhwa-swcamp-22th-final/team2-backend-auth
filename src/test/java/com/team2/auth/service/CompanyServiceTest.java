@@ -35,10 +35,10 @@ class CompanyServiceTest {
     @BeforeEach
     void setUp() {
         companyRepository.saveAndFlush(Company.builder()
-                .name("Team2 Corp")
-                .addressKr("서울시 강남구")
-                .addressEn("Gangnam, Seoul")
-                .tel("02-1234-5678")
+                .companyName("Team2 Corp")
+                .companyAddressKr("서울시 강남구")
+                .companyAddressEn("Gangnam, Seoul")
+                .companyTel("02-1234-5678")
                 .build());
         entityManager.clear();
     }
@@ -48,8 +48,8 @@ class CompanyServiceTest {
     void getCompany_success() {
         Company result = companyService.getCompany();
 
-        assertThat(result.getName()).isEqualTo("Team2 Corp");
-        assertThat(result.getAddressKr()).isEqualTo("서울시 강남구");
+        assertThat(result.getCompanyName()).isEqualTo("Team2 Corp");
+        assertThat(result.getCompanyAddressKr()).isEqualTo("서울시 강남구");
     }
 
     @Test
@@ -79,10 +79,10 @@ class CompanyServiceTest {
         entityManager.clear();
 
         // then - DB에서 다시 조회해서 확인
-        Company updated = companyRepository.findTopByOrderByIdAsc().orElseThrow();
-        assertThat(updated.getName()).isEqualTo("Team2 Updated");
-        assertThat(updated.getTel()).isEqualTo("02-9999-8888");
+        Company updated = companyRepository.findTopByOrderByCompanyIdAsc().orElseThrow();
+        assertThat(updated.getCompanyName()).isEqualTo("Team2 Updated");
+        assertThat(updated.getCompanyTel()).isEqualTo("02-9999-8888");
         // null로 보낸 필드는 기존 값 유지
-        assertThat(updated.getAddressKr()).isEqualTo("서울시 강남구");
+        assertThat(updated.getCompanyAddressKr()).isEqualTo("서울시 강남구");
     }
 }

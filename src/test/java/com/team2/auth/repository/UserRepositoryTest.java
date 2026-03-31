@@ -39,11 +39,11 @@ class UserRepositoryTest {
 
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         user.assignDepartment(savedDepartment);
         user.assignPosition(position);
@@ -52,26 +52,26 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("이메일로 사용자를 조회할 수 있다")
-    void findByEmail() {
+    void findByUserEmail() {
         // given
         String email = "hong@test.com";
 
         // when
-        Optional<User> result = userRepository.findByEmail(email);
+        Optional<User> result = userRepository.findByUserEmail(email);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo("홍길동");
+        assertThat(result.get().getUserName()).isEqualTo("홍길동");
     }
 
     @Test
     @DisplayName("존재하지 않는 이메일로 조회하면 빈 Optional을 반환한다")
-    void findByEmail_notFound() {
+    void findByUserEmail_notFound() {
         // given
         String email = "notexist@test.com";
 
         // when
-        Optional<User> result = userRepository.findByEmail(email);
+        Optional<User> result = userRepository.findByUserEmail(email);
 
         // then
         assertThat(result).isEmpty();
@@ -88,15 +88,15 @@ class UserRepositoryTest {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getEmail()).isEqualTo("hong@test.com");
+        assertThat(result.get().getUserEmail()).isEqualTo("hong@test.com");
     }
 
     @Test
     @DisplayName("이메일 존재 여부를 확인할 수 있다")
-    void existsByEmail() {
+    void existsByUserEmail() {
         // given & when
-        boolean exists = userRepository.existsByEmail("hong@test.com");
-        boolean notExists = userRepository.existsByEmail("notexist@test.com");
+        boolean exists = userRepository.existsByUserEmail("hong@test.com");
+        boolean notExists = userRepository.existsByUserEmail("notexist@test.com");
 
         // then
         assertThat(exists).isTrue();
@@ -117,15 +117,15 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("부서 ID로 사용자 목록을 조회할 수 있다")
-    void findByDepartmentId() {
+    void findByDepartmentDepartmentId() {
         // given
         User user2 = User.builder()
                 .employeeNo("EMP002")
-                .name("김철수")
-                .email("kim@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("김철수")
+                .userEmail("kim@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         user2.assignDepartment(savedDepartment);
         userRepository.save(user2);
@@ -133,8 +133,8 @@ class UserRepositoryTest {
         Department otherDept = departmentRepository.save(new Department("생산부"));
 
         // when
-        List<User> salesUsers = userRepository.findByDepartmentId(savedDepartment.getId());
-        List<User> prodUsers = userRepository.findByDepartmentId(otherDept.getId());
+        List<User> salesUsers = userRepository.findByDepartmentDepartmentId(savedDepartment.getDepartmentId());
+        List<User> prodUsers = userRepository.findByDepartmentDepartmentId(otherDept.getDepartmentId());
 
         // then
         assertThat(salesUsers).hasSize(2);
@@ -143,21 +143,21 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("상태로 사용자 목록을 조회할 수 있다")
-    void findByStatus() {
+    void findByUserStatus() {
         // given
         User retiredUser = User.builder()
                 .employeeNo("EMP003")
-                .name("이영희")
-                .email("lee@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.퇴직)
+                .userName("이영희")
+                .userEmail("lee@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.RETIRED)
                 .build();
         userRepository.save(retiredUser);
 
         // when
-        List<User> activeUsers = userRepository.findByStatus(UserStatus.재직);
-        List<User> retiredUsers = userRepository.findByStatus(UserStatus.퇴직);
+        List<User> activeUsers = userRepository.findByUserStatus(UserStatus.ACTIVE);
+        List<User> retiredUsers = userRepository.findByUserStatus(UserStatus.RETIRED);
 
         // then
         assertThat(activeUsers).hasSize(1);
@@ -170,11 +170,11 @@ class UserRepositoryTest {
         // given
         User newUser = User.builder()
                 .employeeNo("EMP099")
-                .name("prePersist 테스트")
-                .email("prepersist@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("prePersist 테스트")
+                .userEmail("prepersist@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
 
         // when
@@ -193,10 +193,10 @@ class UserRepositoryTest {
 
         // when
         userRepository.saveAndFlush(savedUser);
-        User updated = userRepository.findById(savedUser.getId()).orElseThrow();
+        User updated = userRepository.findById(savedUser.getUserId()).orElseThrow();
 
         // then
         assertThat(updated.getUpdatedAt()).isNotNull();
-        assertThat(updated.getName()).isEqualTo("김길동");
+        assertThat(updated.getUserName()).isEqualTo("김길동");
     }
 }

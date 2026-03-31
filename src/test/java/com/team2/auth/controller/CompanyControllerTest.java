@@ -39,17 +39,17 @@ class CompanyControllerTest {
     void getCompany_success() throws Exception {
         // given
         Company company = Company.builder()
-                .name("Team2 Corp")
-                .addressKr("서울시 강남구")
-                .tel("02-1234-5678")
+                .companyName("Team2 Corp")
+                .companyAddressKr("서울시 강남구")
+                .companyTel("02-1234-5678")
                 .build();
         given(companyService.getCompany()).willReturn(company);
 
         // when & then
         mockMvc.perform(get("/api/company"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Team2 Corp"))
-                .andExpect(jsonPath("$.addressKr").value("서울시 강남구"));
+                .andExpect(jsonPath("$.companyName").value("Team2 Corp"))
+                .andExpect(jsonPath("$.companyAddressKr").value("서울시 강남구"));
     }
 
     @Test
@@ -61,8 +61,8 @@ class CompanyControllerTest {
                 .tel("02-9999-8888")
                 .build();
         Company updated = Company.builder()
-                .name("Team2 Updated")
-                .tel("02-9999-8888")
+                .companyName("Team2 Updated")
+                .companyTel("02-9999-8888")
                 .build();
         given(companyService.updateCompany(any(UpdateCompanyRequest.class))).willReturn(updated);
 
@@ -72,6 +72,6 @@ class CompanyControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Team2 Updated"));
+                .andExpect(jsonPath("$.companyName").value("Team2 Updated"));
     }
 }

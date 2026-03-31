@@ -43,11 +43,11 @@ class JwtProviderTest {
     void setUp() {
         testUser = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         testUser = userRepository.save(testUser);
     }
@@ -72,7 +72,7 @@ class JwtProviderTest {
         Claims claims = jwtProvider.parseAccessToken(token);
 
         // then
-        assertThat(claims.getSubject()).isEqualTo(String.valueOf(testUser.getId()));
+        assertThat(claims.getSubject()).isEqualTo(String.valueOf(testUser.getUserId()));
         assertThat(claims.get("email", String.class)).isEqualTo("hong@test.com");
         assertThat(claims.get("name", String.class)).isEqualTo("홍길동");
         assertThat(claims.get("role", String.class)).isEqualTo("SALES");
@@ -188,7 +188,7 @@ class JwtProviderTest {
         JsonNode payload = mapper.readTree(payloadJson);
 
         // then
-        assertThat(payload.get("sub").asText()).isEqualTo(String.valueOf(testUser.getId()));
+        assertThat(payload.get("sub").asText()).isEqualTo(String.valueOf(testUser.getUserId()));
         assertThat(payload.get("email").asText()).isEqualTo("hong@test.com");
         assertThat(payload.get("name").asText()).isEqualTo("홍길동");
         assertThat(payload.get("role").asText()).isEqualTo("SALES");

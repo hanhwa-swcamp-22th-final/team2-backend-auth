@@ -50,13 +50,13 @@ class DepartmentServiceTest {
         Department result = departmentService.createDepartment("영업부");
 
         // then
-        assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo("영업부");
+        assertThat(result.getDepartmentId()).isNotNull();
+        assertThat(result.getDepartmentName()).isEqualTo("영업부");
 
         // DB에 실제 저장 확인
         entityManager.flush();
         entityManager.clear();
-        assertThat(departmentRepository.findByName("영업부")).isPresent();
+        assertThat(departmentRepository.findByDepartmentName("영업부")).isPresent();
     }
 
     @Test
@@ -84,12 +84,12 @@ class DepartmentServiceTest {
         entityManager.clear();
 
         // when
-        departmentService.deleteDepartment(dept.getId());
+        departmentService.deleteDepartment(dept.getDepartmentId());
         entityManager.flush();
         entityManager.clear();
 
         // then - DB에서 삭제 확인
-        assertThat(departmentRepository.findById(dept.getId())).isEmpty();
+        assertThat(departmentRepository.findById(dept.getDepartmentId())).isEmpty();
     }
 
     @Test
@@ -99,18 +99,18 @@ class DepartmentServiceTest {
         Department dept = departmentRepository.saveAndFlush(new Department("영업부"));
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw(passwordEncoder.encode("pw"))
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw(passwordEncoder.encode("pw"))
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         user.assignDepartment(dept);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
         // when & then
-        assertThatThrownBy(() -> departmentService.deleteDepartment(dept.getId()))
+        assertThatThrownBy(() -> departmentService.deleteDepartment(dept.getDepartmentId()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("소속된 사용자가 있어 삭제할 수 없습니다");
     }

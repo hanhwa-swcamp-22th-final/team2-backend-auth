@@ -26,16 +26,16 @@ class DepartmentRepositoryTest {
 
     @Test
     @DisplayName("부서명으로 부서를 조회할 수 있다")
-    void findByName() {
+    void findByDepartmentName() {
         // given
         String name = "영업부";
 
         // when
-        Optional<Department> result = departmentRepository.findByName(name);
+        Optional<Department> result = departmentRepository.findByDepartmentName(name);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo("영업부");
+        assertThat(result.get().getDepartmentName()).isEqualTo("영업부");
     }
 
     @Test
@@ -53,12 +53,12 @@ class DepartmentRepositoryTest {
 
     @Test
     @DisplayName("존재하지 않는 부서명으로 조회하면 빈 Optional을 반환한다")
-    void findByName_notFound() {
+    void findByDepartmentName_notFound() {
         // given
         String name = "인사부";
 
         // when
-        Optional<Department> result = departmentRepository.findByName(name);
+        Optional<Department> result = departmentRepository.findByDepartmentName(name);
 
         // then
         assertThat(result).isEmpty();

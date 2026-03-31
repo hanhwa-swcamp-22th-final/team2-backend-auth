@@ -69,23 +69,23 @@ class AuthIntegrationTest {
 
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("Test User")
-                .email("test@example.com")
-                .pw(passwordEncoder.encode("password123"))
-                .role(Role.ADMIN)
-                .status(UserStatus.재직)
+                .userName("Test User")
+                .userEmail("test@example.com")
+                .userPw(passwordEncoder.encode("password123"))
+                .userRole(Role.ADMIN)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         savedUser = userRepository.saveAndFlush(user);
 
         savedCompany = companyRepository.saveAndFlush(Company.builder()
-                .name("Test Company")
-                .addressEn("123 Test St")
-                .addressKr("테스트 주소")
-                .tel("02-1234-5678")
-                .fax("02-1234-5679")
-                .email("company@test.com")
-                .website("https://test.com")
-                .sealImageUrl("https://test.com/seal.png")
+                .companyName("Test Company")
+                .companyAddressEn("123 Test St")
+                .companyAddressKr("테스트 주소")
+                .companyTel("02-1234-5678")
+                .companyFax("02-1234-5679")
+                .companyEmail("company@test.com")
+                .companyWebsite("https://test.com")
+                .companySealImageUrl("https://test.com/seal.png")
                 .build());
 
         entityManager.clear();
@@ -96,6 +96,7 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
+    @DisplayName("로그인 성공 - 이메일/패스워드로 유저 찾고 json 파싱해서 토큰 empty 아니면 로그인 성공")
     void login_success() throws Exception {
         String body = objectMapper.writeValueAsString(new LoginRequest("test@example.com", "password123"));
         mockMvc.perform(post("/api/auth/login")
@@ -106,6 +107,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("로그인 실패 - 유저 없음")
     void login_userNotFound_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,6 +115,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("로그인 실패 - 비밀번호 틀림")
     void login_wrongPassword_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,9 +123,10 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("로그인 실패 - 휴직한 유저")
     void login_inactiveUser_throwsViaServlet() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
-        user.changeStatus(UserStatus.휴직);
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        user.changeStatus(UserStatus.ON_LEAVE);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
@@ -136,6 +140,7 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
+    @DisplayName("토큰 재발급 성공")
     void refresh_success() throws Exception {
         TokenResponse loginResp = authService.login("test@example.com", "password123");
         entityManager.flush();
@@ -150,6 +155,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("토큰 재발급 실패 - 유효하지 않은 토큰")
     void refresh_invalidToken_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -157,10 +163,11 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("토큰 재발급 실패 - 만료된 토큰")
     void refresh_expiredToken_throwsViaServlet() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
         refreshTokenRepository.saveAndFlush(RefreshToken.builder()
-                .user(user).token("expired-tok").expiresAt(LocalDateTime.now().minusDays(1)).build());
+                .user(user).tokenValue("expired-tok").tokenExpiresAt(LocalDateTime.now().minusDays(1)).build());
         entityManager.clear();
 
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/refresh")
@@ -173,6 +180,7 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
+    @DisplayName("로그아웃 성공")
     void logout_success() throws Exception {
         authService.login("test@example.com", "password123");
         entityManager.flush();
@@ -180,11 +188,12 @@ class AuthIntegrationTest {
 
         mockMvc.perform(post("/api/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new LogoutRequest(savedUser.getId()))))
+                .content(objectMapper.writeValueAsString(new LogoutRequest(savedUser.getUserId()))))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("로그아웃 실패 - 유저 없음")
     void logout_userNotFound_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,6 +205,7 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
+    @DisplayName("회원등록 성공")
     void createUser_success() throws Exception {
         CreateUserRequest req = CreateUserRequest.builder()
                 .employeeNo("EMP002").name("New").email("new@a.com").password("pw").role(Role.SALES).build();
@@ -206,6 +216,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("회원등록 실패 - 중복 이메일")
     void createUser_duplicateEmail_throwsViaServlet() {
         CreateUserRequest req = CreateUserRequest.builder()
                 .employeeNo("EMP003").name("Dup").email("test@example.com").password("pw").role(Role.SALES).build();
@@ -215,6 +226,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("회원등록 실패 - 중복 사원번호")
     void createUser_duplicateEmployeeNo_throwsViaServlet() {
         CreateUserRequest req = CreateUserRequest.builder()
                 .employeeNo("EMP001").name("Dup").email("uniq@a.com").password("pw").role(Role.SALES).build();
@@ -224,6 +236,7 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("회원목록 조회 성공")
     void getAllUsers_success() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
@@ -231,80 +244,84 @@ class AuthIntegrationTest {
     }
 
     @Test
+    @DisplayName("회원 조회 성공")
     void getUser_success() throws Exception {
-        mockMvc.perform(get("/api/users/{id}", savedUser.getId()))
+        mockMvc.perform(get("/api/users/{id}", savedUser.getUserId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test User"));
+                .andExpect(jsonPath("$.userName").value("Test User"));
     }
 
     @Test
+    @DisplayName("회원 조회 실패 - 유저 없음")
     void getUser_notFound_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(get("/api/users/{id}", 99999)));
     }
 
     @Test
+    @DisplayName("회원 수정 성공")
     void updateUser_withDeptAndPosition() throws Exception {
         UpdateUserRequest req = UpdateUserRequest.builder()
                 .name("Up").email("up@a.com")
-                .departmentId(savedDept.getId()).positionId(savedPosition.getId()).build();
-        mockMvc.perform(put("/api/users/{id}", savedUser.getId())
+                .departmentId(savedDept.getDepartmentId()).positionId(savedPosition.getPositionId()).build();
+        mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Up"));
+                .andExpect(jsonPath("$.userName").value("Up"));
     }
 
     @Test
+    @DisplayName("회원 수정 - 부서 변경과 직급 변경 없이")
     void updateUser_withoutDeptAndPosition() throws Exception {
         UpdateUserRequest req = UpdateUserRequest.builder().name("OnlyName").build();
-        mockMvc.perform(put("/api/users/{id}", savedUser.getId())
+        mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("OnlyName"));
+                .andExpect(jsonPath("$.userName").value("OnlyName"));
     }
 
     @Test
     void updateUser_nullNameAndEmail() throws Exception {
         UpdateUserRequest req = UpdateUserRequest.builder().build();
-        mockMvc.perform(put("/api/users/{id}", savedUser.getId())
+        mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test User"))
-                .andExpect(jsonPath("$.email").value("test@example.com"));
+                .andExpect(jsonPath("$.userName").value("Test User"))
+                .andExpect(jsonPath("$.userEmail").value("test@example.com"));
     }
 
     @Test
     void updateUser_deptNotFound_throwsViaServlet() {
         UpdateUserRequest req = UpdateUserRequest.builder().departmentId(99999).build();
-        assertThrows(ServletException.class, () -> mockMvc.perform(put("/api/users/{id}", savedUser.getId())
+        assertThrows(ServletException.class, () -> mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))));
     }
 
     @Test
     void updateUser_posNotFound_throwsViaServlet() {
         UpdateUserRequest req = UpdateUserRequest.builder().positionId(99999).build();
-        assertThrows(ServletException.class, () -> mockMvc.perform(put("/api/users/{id}", savedUser.getId())
+        assertThrows(ServletException.class, () -> mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))));
     }
 
     @Test
     void changeStatus_success() throws Exception {
-        mockMvc.perform(patch("/api/users/{id}/status", savedUser.getId())
+        mockMvc.perform(patch("/api/users/{id}/status", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new ChangeStatusRequest(UserStatus.휴직))))
+                .content(objectMapper.writeValueAsString(new ChangeStatusRequest(UserStatus.ON_LEAVE))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("휴직"));
+                .andExpect(jsonPath("$.userStatus").value("ON_LEAVE"));
     }
 
     @Test
     void changeStatus_retiredUser_throwsViaServlet() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
-        user.changeStatus(UserStatus.퇴직);
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        user.changeStatus(UserStatus.RETIRED);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
-        assertThrows(ServletException.class, () -> mockMvc.perform(patch("/api/users/{id}/status", savedUser.getId())
+        assertThrows(ServletException.class, () -> mockMvc.perform(patch("/api/users/{id}/status", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new ChangeStatusRequest(UserStatus.재직)))));
+                .content(objectMapper.writeValueAsString(new ChangeStatusRequest(UserStatus.ACTIVE)))));
     }
 
     // ========================================================================
@@ -315,7 +332,7 @@ class AuthIntegrationTest {
     void getCompany_success() throws Exception {
         mockMvc.perform(get("/api/company"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test Company"));
+                .andExpect(jsonPath("$.companyName").value("Test Company"));
     }
 
     @Test
@@ -335,7 +352,7 @@ class AuthIntegrationTest {
         mockMvc.perform(put("/api/company").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Up"));
+                .andExpect(jsonPath("$.companyName").value("Up"));
     }
 
     @Test
@@ -344,7 +361,7 @@ class AuthIntegrationTest {
         mockMvc.perform(put("/api/company").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test Company"));
+                .andExpect(jsonPath("$.companyName").value("Test Company"));
     }
 
     @Test
@@ -353,8 +370,8 @@ class AuthIntegrationTest {
         mockMvc.perform(put("/api/company").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Partial"))
-                .andExpect(jsonPath("$.addressEn").value("123 Test St"));
+                .andExpect(jsonPath("$.companyName").value("Partial"))
+                .andExpect(jsonPath("$.companyAddressEn").value("123 Test St"));
     }
 
     // ========================================================================
@@ -366,7 +383,7 @@ class AuthIntegrationTest {
         mockMvc.perform(post("/api/departments").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new CreateDepartmentRequest("HR"))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("HR"));
+                .andExpect(jsonPath("$.departmentName").value("HR"));
     }
 
     @Test
@@ -378,7 +395,7 @@ class AuthIntegrationTest {
 
     @Test
     void deleteDepartment_success() throws Exception {
-        mockMvc.perform(delete("/api/departments/{id}", savedDept.getId()))
+        mockMvc.perform(delete("/api/departments/{id}", savedDept.getDepartmentId()))
                 .andExpect(status().isNoContent());
     }
 
@@ -389,12 +406,12 @@ class AuthIntegrationTest {
 
     @Test
     void deleteDepartment_hasUsers_throwsViaServlet() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
         user.assignDepartment(savedDept);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
-        assertThrows(ServletException.class, () -> mockMvc.perform(delete("/api/departments/{id}", savedDept.getId())));
+        assertThrows(ServletException.class, () -> mockMvc.perform(delete("/api/departments/{id}", savedDept.getDepartmentId())));
     }
 
     // ========================================================================
@@ -406,7 +423,7 @@ class AuthIntegrationTest {
         mockMvc.perform(post("/api/positions").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new CreatePositionRequest("팀원", 2))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("팀원"));
+                .andExpect(jsonPath("$.positionName").value("팀원"));
     }
 
     @Test

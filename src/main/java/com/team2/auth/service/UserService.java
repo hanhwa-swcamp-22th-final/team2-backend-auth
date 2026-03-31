@@ -28,7 +28,7 @@ public class UserService {
 
     @Transactional
     public User createUser(CreateUserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByUserEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
         if (userRepository.existsByEmployeeNo(request.getEmployeeNo())) {
@@ -37,11 +37,11 @@ public class UserService {
 
         User user = User.builder()
                 .employeeNo(request.getEmployeeNo())
-                .name(request.getName())
-                .email(request.getEmail())
-                .pw(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .status(UserStatus.재직)
+                .userName(request.getName())
+                .userEmail(request.getEmail())
+                .userPw(passwordEncoder.encode(request.getPassword()))
+                .userRole(request.getRole())
+                .userStatus(UserStatus.ACTIVE)
                 .build();
 
         return userRepository.save(user);

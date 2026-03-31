@@ -38,14 +38,14 @@ class PositionServiceTest {
         Position result = positionService.createPosition("팀원", 2);
 
         // then
-        assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo("팀원");
-        assertThat(result.getLevel()).isEqualTo(2);
+        assertThat(result.getPositionId()).isNotNull();
+        assertThat(result.getPositionName()).isEqualTo("팀원");
+        assertThat(result.getPositionLevel()).isEqualTo(2);
 
         // DB에 실제 저장 확인
         entityManager.flush();
         entityManager.clear();
-        assertThat(positionRepository.findByName("팀원")).isPresent();
+        assertThat(positionRepository.findByPositionName("팀원")).isPresent();
     }
 
     @Test

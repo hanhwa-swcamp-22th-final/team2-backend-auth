@@ -26,10 +26,10 @@ public class AuthService {
 
     @Transactional
     public TokenResponse login(String email, String password) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByUserEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(password, user.getPw())) {
+        if (!passwordEncoder.matches(password, user.getUserPw())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -42,8 +42,8 @@ public class AuthService {
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
-                .token(refreshTokenValue)
-                .expiresAt(LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshTokenExpiry())))
+                .tokenValue(refreshTokenValue)
+                .tokenExpiresAt(LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshTokenExpiry())))
                 .build();
         refreshTokenRepository.save(refreshToken);
 
@@ -55,7 +55,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponse refreshToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenValue(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
 
         if (refreshToken.isExpired()) {
@@ -71,8 +71,8 @@ public class AuthService {
 
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .user(user)
-                .token(newRefreshTokenValue)
-                .expiresAt(LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshTokenExpiry())))
+                .tokenValue(newRefreshTokenValue)
+                .tokenExpiresAt(LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshTokenExpiry())))
                 .build();
         refreshTokenRepository.save(newRefreshToken);
 

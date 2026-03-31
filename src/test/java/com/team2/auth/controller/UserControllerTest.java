@@ -43,11 +43,11 @@ class UserControllerTest {
     private User createTestUser() {
         return User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
     }
 
@@ -70,8 +70,8 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("홍길동"))
-                .andExpect(jsonPath("$.email").value("hong@test.com"));
+                .andExpect(jsonPath("$.userName").value("홍길동"))
+                .andExpect(jsonPath("$.userEmail").value("hong@test.com"));
     }
 
     @Test
@@ -83,7 +83,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("홍길동"));
+                .andExpect(jsonPath("$[0].userName").value("홍길동"));
     }
 
     @Test
@@ -95,7 +95,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("홍길동"));
+                .andExpect(jsonPath("$.userName").value("홍길동"));
     }
 
     @Test
@@ -108,11 +108,11 @@ class UserControllerTest {
                 .build();
         User updatedUser = User.builder()
                 .employeeNo("EMP001")
-                .name("김길동")
-                .email("kim@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("김길동")
+                .userEmail("kim@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         given(userService.updateUser(eq(1), any(UpdateUserRequest.class))).willReturn(updatedUser);
 
@@ -122,23 +122,23 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("김길동"));
+                .andExpect(jsonPath("$.userName").value("김길동"));
     }
 
     @Test
     @DisplayName("PATCH /api/users/{id}/status - 상태 변경 성공")
     void changeStatus_success() throws Exception {
         // given
-        ChangeStatusRequest request = new ChangeStatusRequest(UserStatus.휴직);
+        ChangeStatusRequest request = new ChangeStatusRequest(UserStatus.ON_LEAVE);
         User updatedUser = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.휴직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ON_LEAVE)
                 .build();
-        given(userService.changeStatus(eq(1), eq(UserStatus.휴직))).willReturn(updatedUser);
+        given(userService.changeStatus(eq(1), eq(UserStatus.ON_LEAVE))).willReturn(updatedUser);
 
         // when & then
         mockMvc.perform(patch("/api/users/1/status")
@@ -146,6 +146,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("휴직"));
+                .andExpect(jsonPath("$.userStatus").value("ON_LEAVE"));
     }
 }

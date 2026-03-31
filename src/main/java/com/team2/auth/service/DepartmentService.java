@@ -31,7 +31,7 @@ public class DepartmentService {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
 
-        if (!userRepository.findByDepartmentId(id).isEmpty()) {
+        if (!userRepository.findByDepartmentDepartmentId(id).isEmpty()) {
             throw new IllegalStateException("소속된 사용자가 있어 삭제할 수 없습니다.");
         }
 

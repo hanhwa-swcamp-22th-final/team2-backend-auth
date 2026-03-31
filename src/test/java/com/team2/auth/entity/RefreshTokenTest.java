@@ -32,11 +32,11 @@ class RefreshTokenTest {
     private User createAndSaveUser(String employeeNo, String email) {
         User user = User.builder()
                 .employeeNo(employeeNo)
-                .name("테스트유저")
-                .email(email)
-                .pw("hashedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("테스트유저")
+                .userEmail(email)
+                .userPw("hashedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         return userRepository.save(user);
     }
@@ -51,22 +51,22 @@ class RefreshTokenTest {
         // when
         RefreshToken token = RefreshToken.builder()
                 .user(user)
-                .token("sample-refresh-token-value")
-                .expiresAt(expiresAt)
+                .tokenValue("sample-refresh-token-value")
+                .tokenExpiresAt(expiresAt)
                 .build();
 
         // then - 도메인 로직 검증
-        assertEquals("sample-refresh-token-value", token.getToken());
-        assertEquals(expiresAt, token.getExpiresAt());
+        assertEquals("sample-refresh-token-value", token.getTokenValue());
+        assertEquals(expiresAt, token.getTokenExpiresAt());
 
         // DB 저장 후 재조회 검증
         refreshTokenRepository.save(token);
         entityManager.flush();
         entityManager.clear();
 
-        RefreshToken found = refreshTokenRepository.findById(token.getId()).orElseThrow();
-        assertEquals("sample-refresh-token-value", found.getToken());
-        assertNotNull(found.getExpiresAt());
+        RefreshToken found = refreshTokenRepository.findById(token.getRefreshTokenId()).orElseThrow();
+        assertEquals("sample-refresh-token-value", found.getTokenValue());
+        assertNotNull(found.getTokenExpiresAt());
         assertNotNull(found.getCreatedAt());
     }
 
@@ -77,8 +77,8 @@ class RefreshTokenTest {
         User user = createAndSaveUser("EMP002", "user2@test.com");
         RefreshToken token = RefreshToken.builder()
                 .user(user)
-                .token("expired-token")
-                .expiresAt(LocalDateTime.now().minusHours(1))
+                .tokenValue("expired-token")
+                .tokenExpiresAt(LocalDateTime.now().minusHours(1))
                 .build();
 
         // when & then
@@ -89,7 +89,7 @@ class RefreshTokenTest {
         entityManager.flush();
         entityManager.clear();
 
-        RefreshToken found = refreshTokenRepository.findById(token.getId()).orElseThrow();
+        RefreshToken found = refreshTokenRepository.findById(token.getRefreshTokenId()).orElseThrow();
         assertTrue(found.isExpired());
     }
 
@@ -100,8 +100,8 @@ class RefreshTokenTest {
         User user = createAndSaveUser("EMP003", "user3@test.com");
         RefreshToken token = RefreshToken.builder()
                 .user(user)
-                .token("valid-token")
-                .expiresAt(LocalDateTime.now().plusDays(7))
+                .tokenValue("valid-token")
+                .tokenExpiresAt(LocalDateTime.now().plusDays(7))
                 .build();
 
         // when & then
@@ -112,7 +112,7 @@ class RefreshTokenTest {
         entityManager.flush();
         entityManager.clear();
 
-        RefreshToken found = refreshTokenRepository.findById(token.getId()).orElseThrow();
+        RefreshToken found = refreshTokenRepository.findById(token.getRefreshTokenId()).orElseThrow();
         assertFalse(found.isExpired());
     }
 }

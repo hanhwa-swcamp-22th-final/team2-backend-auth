@@ -26,16 +26,16 @@ class PositionRepositoryTest {
 
     @Test
     @DisplayName("직급명으로 직급을 조회할 수 있다")
-    void findByName() {
+    void findByPositionName() {
         // given
         String name = "팀장";
 
         // when
-        Optional<Position> result = positionRepository.findByName(name);
+        Optional<Position> result = positionRepository.findByPositionName(name);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getLevel()).isEqualTo(1);
+        assertThat(result.get().getPositionLevel()).isEqualTo(1);
     }
 
     @Test
@@ -53,12 +53,12 @@ class PositionRepositoryTest {
 
     @Test
     @DisplayName("존재하지 않는 직급명으로 조회하면 빈 Optional을 반환한다")
-    void findByName_notFound() {
+    void findByPositionName_notFound() {
         // given
         String name = "임원";
 
         // when
-        Optional<Position> result = positionRepository.findByName(name);
+        Optional<Position> result = positionRepository.findByPositionName(name);
 
         // then
         assertThat(result).isEmpty();

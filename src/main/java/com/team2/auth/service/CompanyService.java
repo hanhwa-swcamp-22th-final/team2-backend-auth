@@ -15,7 +15,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
 
     public Company getCompany() {
-        return companyRepository.findTopByOrderByIdAsc()
+        return companyRepository.findTopByOrderByCompanyIdAsc()
                 .orElseThrow(() -> new IllegalArgumentException("회사 정보를 찾을 수 없습니다."));
     }
 

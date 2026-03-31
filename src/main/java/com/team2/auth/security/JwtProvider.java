@@ -32,10 +32,10 @@ public class JwtProvider {
     public String generateAccessToken(User user) {
         Date now = new Date();
         return Jwts.builder()
-                .subject(String.valueOf(user.getId()))
-                .claim("email", user.getEmail())
-                .claim("name", user.getName())
-                .claim("role", user.getRole().name())
+                .subject(String.valueOf(user.getUserId()))
+                .claim("email", user.getUserEmail())
+                .claim("name", user.getUserName())
+                .claim("role", user.getUserRole().name())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpiry))
                 .signWith(secretKey)

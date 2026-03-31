@@ -55,11 +55,11 @@ class AuthServiceTest {
     void setUp() {
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw(passwordEncoder.encode("rawPassword"))
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw(passwordEncoder.encode("rawPassword"))
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         savedUser = userRepository.saveAndFlush(user);
         entityManager.clear();
@@ -80,7 +80,7 @@ class AuthServiceTest {
         assertThat(response.getRefreshToken()).isNotBlank();
 
         // DB에 RefreshToken이 저장되었는지 확인
-        assertThat(refreshTokenRepository.findByToken(response.getRefreshToken())).isPresent();
+        assertThat(refreshTokenRepository.findByTokenValue(response.getRefreshToken())).isPresent();
     }
 
     @Test
@@ -91,7 +91,7 @@ class AuthServiceTest {
 
         // then
         var claims = jwtProvider.parseAccessToken(response.getAccessToken());
-        assertThat(claims.getSubject()).isEqualTo(String.valueOf(savedUser.getId()));
+        assertThat(claims.getSubject()).isEqualTo(String.valueOf(savedUser.getUserId()));
         assertThat(claims.get("email")).isEqualTo("hong@test.com");
         assertThat(claims.get("name")).isEqualTo("홍길동");
         assertThat(claims.get("role")).isEqualTo("SALES");
@@ -116,8 +116,8 @@ class AuthServiceTest {
     @Test
     @DisplayName("퇴직 상태 사용자는 로그인할 수 없다")
     void login_retiredUser() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
-        user.changeStatus(UserStatus.퇴직);
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        user.changeStatus(UserStatus.RETIRED);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
@@ -129,8 +129,8 @@ class AuthServiceTest {
     @Test
     @DisplayName("휴직 상태 사용자는 로그인할 수 없다")
     void login_onLeaveUser() {
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
-        user.changeStatus(UserStatus.휴직);
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        user.changeStatus(UserStatus.ON_LEAVE);
         userRepository.saveAndFlush(user);
         entityManager.clear();
 
@@ -159,8 +159,8 @@ class AuthServiceTest {
         assertThat(refreshResponse.getRefreshToken()).isNotBlank();
 
         // 이전 토큰은 삭제되고 새 토큰이 DB에 저장됨 (로테이션)
-        assertThat(refreshTokenRepository.findByToken(loginResponse.getRefreshToken())).isEmpty();
-        assertThat(refreshTokenRepository.findByToken(refreshResponse.getRefreshToken())).isPresent();
+        assertThat(refreshTokenRepository.findByTokenValue(loginResponse.getRefreshToken())).isEmpty();
+        assertThat(refreshTokenRepository.findByTokenValue(refreshResponse.getRefreshToken())).isPresent();
     }
 
     @Test
@@ -175,11 +175,11 @@ class AuthServiceTest {
     @DisplayName("만료된 리프레시 토큰으로 갱신 시 예외가 발생하고 토큰이 삭제된다")
     void refreshToken_expired() {
         // given - 만료된 토큰을 직접 DB에 넣기
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
         RefreshToken expiredToken = RefreshToken.builder()
                 .user(user)
-                .token("expired-token")
-                .expiresAt(LocalDateTime.now().minusDays(1))
+                .tokenValue("expired-token")
+                .tokenExpiresAt(LocalDateTime.now().minusDays(1))
                 .build();
         refreshTokenRepository.saveAndFlush(expiredToken);
         entityManager.clear();
@@ -192,7 +192,7 @@ class AuthServiceTest {
         // 만료된 토큰이 DB에서 삭제됐는지 확인
         entityManager.flush();
         entityManager.clear();
-        assertThat(refreshTokenRepository.findByToken("expired-token")).isEmpty();
+        assertThat(refreshTokenRepository.findByTokenValue("expired-token")).isEmpty();
     }
 
     // ========================================================================
@@ -208,12 +208,12 @@ class AuthServiceTest {
         entityManager.clear();
 
         // when
-        authService.logout(savedUser.getId());
+        authService.logout(savedUser.getUserId());
         entityManager.flush();
         entityManager.clear();
 
         // then - 해당 사용자의 토큰이 전부 삭제됨
-        User user = userRepository.findById(savedUser.getId()).orElseThrow();
+        User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
         assertThat(refreshTokenRepository.findByUser(user)).isEmpty();
     }
 

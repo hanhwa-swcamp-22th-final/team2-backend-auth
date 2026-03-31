@@ -62,11 +62,11 @@ class UserServiceTest {
 
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw(passwordEncoder.encode("rawPassword"))
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw(passwordEncoder.encode("rawPassword"))
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         savedUser = userRepository.saveAndFlush(user);
         entityManager.clear();
@@ -88,18 +88,18 @@ class UserServiceTest {
         User result = userService.createUser(request);
 
         // then
-        assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo("김철수");
-        assertThat(result.getEmail()).isEqualTo("kim@test.com");
-        assertThat(result.getStatus()).isEqualTo(UserStatus.재직);
+        assertThat(result.getUserId()).isNotNull();
+        assertThat(result.getUserName()).isEqualTo("김철수");
+        assertThat(result.getUserEmail()).isEqualTo("kim@test.com");
+        assertThat(result.getUserStatus()).isEqualTo(UserStatus.ACTIVE);
 
         // BCrypt로 암호화되어 저장됐는지 확인
-        assertThat(passwordEncoder.matches("password123", result.getPw())).isTrue();
+        assertThat(passwordEncoder.matches("password123", result.getUserPw())).isTrue();
 
         // DB에 실제로 저장됐는지 확인
         entityManager.flush();
         entityManager.clear();
-        assertThat(userRepository.findByEmail("kim@test.com")).isPresent();
+        assertThat(userRepository.findByUserEmail("kim@test.com")).isPresent();
     }
 
     @Test
@@ -137,10 +137,10 @@ class UserServiceTest {
     @Test
     @DisplayName("ID로 사용자를 조회할 수 있다")
     void getUser_success() {
-        User result = userService.getUser(savedUser.getId());
+        User result = userService.getUser(savedUser.getUserId());
 
-        assertThat(result.getName()).isEqualTo("홍길동");
-        assertThat(result.getEmail()).isEqualTo("hong@test.com");
+        assertThat(result.getUserName()).isEqualTo("홍길동");
+        assertThat(result.getUserEmail()).isEqualTo("hong@test.com");
     }
 
     @Test
@@ -158,21 +158,21 @@ class UserServiceTest {
         UpdateUserRequest request = UpdateUserRequest.builder()
                 .name("김길동")
                 .email("kim@test.com")
-                .departmentId(savedDept.getId())
-                .positionId(savedPosition.getId())
+                .departmentId(savedDept.getDepartmentId())
+                .positionId(savedPosition.getPositionId())
                 .build();
 
         // when
-        User result = userService.updateUser(savedUser.getId(), request);
+        User result = userService.updateUser(savedUser.getUserId(), request);
         entityManager.flush();
         entityManager.clear();
 
         // then - DB에서 다시 조회해서 실제 반영 확인
-        User updated = userRepository.findById(savedUser.getId()).orElseThrow();
-        assertThat(updated.getName()).isEqualTo("김길동");
-        assertThat(updated.getEmail()).isEqualTo("kim@test.com");
-        assertThat(updated.getDepartment().getName()).isEqualTo("영업부");
-        assertThat(updated.getPosition().getName()).isEqualTo("팀원");
+        User updated = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        assertThat(updated.getUserName()).isEqualTo("김길동");
+        assertThat(updated.getUserEmail()).isEqualTo("kim@test.com");
+        assertThat(updated.getDepartment().getDepartmentName()).isEqualTo("영업부");
+        assertThat(updated.getPosition().getPositionName()).isEqualTo("팀원");
     }
 
     @Test
@@ -182,12 +182,12 @@ class UserServiceTest {
                 .name("김길동")
                 .email("kim@test.com")
                 .departmentId(null)
-                .positionId(savedPosition.getId())
+                .positionId(savedPosition.getPositionId())
                 .build();
 
-        User result = userService.updateUser(savedUser.getId(), request);
+        User result = userService.updateUser(savedUser.getUserId(), request);
 
-        assertThat(result.getName()).isEqualTo("김길동");
+        assertThat(result.getUserName()).isEqualTo("김길동");
         assertThat(result.getDepartment()).isNull();
     }
 
@@ -197,13 +197,13 @@ class UserServiceTest {
         UpdateUserRequest request = UpdateUserRequest.builder()
                 .name("김길동")
                 .email("kim@test.com")
-                .departmentId(savedDept.getId())
+                .departmentId(savedDept.getDepartmentId())
                 .positionId(null)
                 .build();
 
-        User result = userService.updateUser(savedUser.getId(), request);
+        User result = userService.updateUser(savedUser.getUserId(), request);
 
-        assertThat(result.getName()).isEqualTo("김길동");
+        assertThat(result.getUserName()).isEqualTo("김길동");
         assertThat(result.getPosition()).isNull();
     }
 
@@ -215,7 +215,7 @@ class UserServiceTest {
                 .departmentId(99999)
                 .build();
 
-        assertThatThrownBy(() -> userService.updateUser(savedUser.getId(), request))
+        assertThatThrownBy(() -> userService.updateUser(savedUser.getUserId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("부서를 찾을 수 없습니다");
     }
@@ -228,7 +228,7 @@ class UserServiceTest {
                 .positionId(99999)
                 .build();
 
-        assertThatThrownBy(() -> userService.updateUser(savedUser.getId(), request))
+        assertThatThrownBy(() -> userService.updateUser(savedUser.getUserId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("직급을 찾을 수 없습니다");
     }
@@ -236,26 +236,26 @@ class UserServiceTest {
     @Test
     @DisplayName("사용자 상태를 변경할 수 있다")
     void changeStatus_success() {
-        User result = userService.changeStatus(savedUser.getId(), UserStatus.휴직);
+        User result = userService.changeStatus(savedUser.getUserId(), UserStatus.ON_LEAVE);
 
-        assertThat(result.getStatus()).isEqualTo(UserStatus.휴직);
+        assertThat(result.getUserStatus()).isEqualTo(UserStatus.ON_LEAVE);
 
         // DB에서도 확인
         entityManager.flush();
         entityManager.clear();
-        User updated = userRepository.findById(savedUser.getId()).orElseThrow();
-        assertThat(updated.getStatus()).isEqualTo(UserStatus.휴직);
+        User updated = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        assertThat(updated.getUserStatus()).isEqualTo(UserStatus.ON_LEAVE);
     }
 
     @Test
     @DisplayName("퇴직 상태의 사용자는 상태를 변경할 수 없다")
     void changeStatus_retired() {
         // 먼저 퇴직 상태로 변경
-        userService.changeStatus(savedUser.getId(), UserStatus.퇴직);
+        userService.changeStatus(savedUser.getUserId(), UserStatus.RETIRED);
         entityManager.flush();
         entityManager.clear();
 
-        assertThatThrownBy(() -> userService.changeStatus(savedUser.getId(), UserStatus.재직))
+        assertThatThrownBy(() -> userService.changeStatus(savedUser.getUserId(), UserStatus.ACTIVE))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("퇴직한 사용자");
     }
@@ -266,6 +266,6 @@ class UserServiceTest {
         List<User> result = userService.getAllUsers();
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("홍길동");
+        assertThat(result.get(0).getUserName()).isEqualTo("홍길동");
     }
 }

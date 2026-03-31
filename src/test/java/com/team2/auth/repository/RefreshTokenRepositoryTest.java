@@ -31,41 +31,41 @@ class RefreshTokenRepositoryTest {
     void setUp() {
         User user = User.builder()
                 .employeeNo("EMP001")
-                .name("홍길동")
-                .email("hong@test.com")
-                .pw("encodedPassword")
-                .role(Role.SALES)
-                .status(UserStatus.재직)
+                .userName("홍길동")
+                .userEmail("hong@test.com")
+                .userPw("encodedPassword")
+                .userRole(Role.SALES)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
         savedUser = userRepository.save(user);
 
         RefreshToken token = RefreshToken.builder()
                 .user(savedUser)
-                .token("refresh-token-value-123")
-                .expiresAt(LocalDateTime.now().plusDays(7))
+                .tokenValue("refresh-token-value-123")
+                .tokenExpiresAt(LocalDateTime.now().plusDays(7))
                 .build();
         refreshTokenRepository.save(token);
     }
 
     @Test
     @DisplayName("토큰 값으로 리프레시 토큰을 조회할 수 있다")
-    void findByToken() {
+    void findByTokenValue() {
         // given
         String tokenValue = "refresh-token-value-123";
 
         // when
-        Optional<RefreshToken> result = refreshTokenRepository.findByToken(tokenValue);
+        Optional<RefreshToken> result = refreshTokenRepository.findByTokenValue(tokenValue);
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getUser().getId()).isEqualTo(savedUser.getId());
+        assertThat(result.get().getUser().getUserId()).isEqualTo(savedUser.getUserId());
     }
 
     @Test
     @DisplayName("존재하지 않는 토큰으로 조회하면 빈 Optional을 반환한다")
-    void findByToken_notFound() {
+    void findByTokenValue_notFound() {
         // given & when
-        Optional<RefreshToken> result = refreshTokenRepository.findByToken("invalid-token");
+        Optional<RefreshToken> result = refreshTokenRepository.findByTokenValue("invalid-token");
 
         // then
         assertThat(result).isEmpty();
@@ -79,7 +79,7 @@ class RefreshTokenRepositoryTest {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get().getToken()).isEqualTo("refresh-token-value-123");
+        assertThat(result.get().getTokenValue()).isEqualTo("refresh-token-value-123");
     }
 
     @Test
@@ -88,8 +88,8 @@ class RefreshTokenRepositoryTest {
         // given
         RefreshToken token = RefreshToken.builder()
                 .user(savedUser)
-                .token("created-at-test-token")
-                .expiresAt(LocalDateTime.now().plusDays(7))
+                .tokenValue("created-at-test-token")
+                .tokenExpiresAt(LocalDateTime.now().plusDays(7))
                 .build();
 
         // when

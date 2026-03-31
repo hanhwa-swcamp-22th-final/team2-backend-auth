@@ -14,60 +14,60 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "company_id")
-    private Integer id;
+    private Integer companyId;
 
     @Column(name = "company_name", nullable = false, length = 200)
-    private String name;
+    private String companyName;
 
     @Column(name = "company_address_en", length = 500)
-    private String addressEn;
+    private String companyAddressEn;
 
     @Column(name = "company_address_kr", length = 500)
-    private String addressKr;
+    private String companyAddressKr;
 
     @Column(name = "company_tel", length = 50)
-    private String tel;
+    private String companyTel;
 
     @Column(name = "company_fax", length = 50)
-    private String fax;
+    private String companyFax;
 
     @Column(name = "company_email", length = 255)
-    private String email;
+    private String companyEmail;
 
     @Column(name = "company_website", length = 255)
-    private String website;
+    private String companyWebsite;
 
     @Column(name = "company_seal_image_url", length = 500)
-    private String sealImageUrl;
+    private String companySealImageUrl;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Builder
-    public Company(String name, String addressEn, String addressKr,
-                   String tel, String fax, String email,
-                   String website, String sealImageUrl) {
-        this.name = name;
-        this.addressEn = addressEn;
-        this.addressKr = addressKr;
-        this.tel = tel;
-        this.fax = fax;
-        this.email = email;
-        this.website = website;
-        this.sealImageUrl = sealImageUrl;
+    public Company(String companyName, String companyAddressEn, String companyAddressKr,
+                   String companyTel, String companyFax, String companyEmail,
+                   String companyWebsite, String companySealImageUrl) {
+        this.companyName = companyName;
+        this.companyAddressEn = companyAddressEn;
+        this.companyAddressKr = companyAddressKr;
+        this.companyTel = companyTel;
+        this.companyFax = companyFax;
+        this.companyEmail = companyEmail;
+        this.companyWebsite = companyWebsite;
+        this.companySealImageUrl = companySealImageUrl;
     }
 
-    public void updateInfo(String name, String addressEn, String addressKr,
-                           String tel, String fax, String email,
-                           String website, String sealImageUrl) {
-        if (name != null) this.name = name;
-        if (addressEn != null) this.addressEn = addressEn;
-        if (addressKr != null) this.addressKr = addressKr;
-        if (tel != null) this.tel = tel;
-        if (fax != null) this.fax = fax;
-        if (email != null) this.email = email;
-        if (website != null) this.website = website;
-        if (sealImageUrl != null) this.sealImageUrl = sealImageUrl;
+    public void updateInfo(String companyName, String companyAddressEn, String companyAddressKr,
+                           String companyTel, String companyFax, String companyEmail,
+                           String companyWebsite, String companySealImageUrl) {
+        if (companyName != null) this.companyName = companyName;
+        if (companyAddressEn != null) this.companyAddressEn = companyAddressEn;
+        if (companyAddressKr != null) this.companyAddressKr = companyAddressKr;
+        if (companyTel != null) this.companyTel = companyTel;
+        if (companyFax != null) this.companyFax = companyFax;
+        if (companyEmail != null) this.companyEmail = companyEmail;
+        if (companyWebsite != null) this.companyWebsite = companyWebsite;
+        if (companySealImageUrl != null) this.companySealImageUrl = companySealImageUrl;
     }
 
     @PreUpdate

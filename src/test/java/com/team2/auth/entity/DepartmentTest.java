@@ -28,15 +28,15 @@ class DepartmentTest {
         Department department = new Department("영업1팀");
 
         // then - 도메인 로직 검증
-        assertEquals("영업1팀", department.getName());
+        assertEquals("영업1팀", department.getDepartmentName());
 
         // DB 저장 후 재조회 검증
         departmentRepository.save(department);
         entityManager.flush();
         entityManager.clear();
 
-        Department found = departmentRepository.findById(department.getId()).orElseThrow();
-        assertEquals("영업1팀", found.getName());
+        Department found = departmentRepository.findById(department.getDepartmentId()).orElseThrow();
+        assertEquals("영업1팀", found.getDepartmentName());
         // @PrePersist로 createdAt 자동설정 확인
         assertNotNull(found.getCreatedAt());
     }

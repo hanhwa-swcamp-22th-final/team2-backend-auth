@@ -48,7 +48,7 @@ class DepartmentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("영업부"));
+                .andExpect(jsonPath("$.departmentName").value("영업부"));
     }
 
     @Test
@@ -63,8 +63,8 @@ class DepartmentControllerTest {
         // when & then
         mockMvc.perform(get("/api/departments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("영업부"))
-                .andExpect(jsonPath("$[1].name").value("생산부"));
+                .andExpect(jsonPath("$[0].departmentName").value("영업부"))
+                .andExpect(jsonPath("$[1].departmentName").value("생산부"));
     }
 
     @Test

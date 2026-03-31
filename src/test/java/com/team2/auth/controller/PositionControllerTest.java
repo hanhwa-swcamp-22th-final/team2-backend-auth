@@ -48,8 +48,8 @@ class PositionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("팀원"))
-                .andExpect(jsonPath("$.level").value(2));
+                .andExpect(jsonPath("$.positionName").value("팀원"))
+                .andExpect(jsonPath("$.positionLevel").value(2));
     }
 
     @Test
@@ -64,7 +64,7 @@ class PositionControllerTest {
         // when & then
         mockMvc.perform(get("/api/positions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("팀장"))
-                .andExpect(jsonPath("$[1].name").value("팀원"));
+                .andExpect(jsonPath("$[0].positionName").value("팀장"))
+                .andExpect(jsonPath("$[1].positionName").value("팀원"));
     }
 }

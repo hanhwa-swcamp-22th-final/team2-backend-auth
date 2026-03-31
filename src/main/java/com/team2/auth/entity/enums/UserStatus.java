@@ -1,7 +1,7 @@
 package com.team2.auth.entity.enums;
 
 public enum UserStatus {
-    재직,
-    휴직,
-    퇴직
+    ACTIVE,     // 재직
+    ON_LEAVE,   // 휴직
+    RETIRED     // 퇴직 (터미널 상태)
 }

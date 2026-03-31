@@ -16,23 +16,23 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Integer id;
+    private Integer userId;
 
     @Column(name = "employee_no", nullable = false, unique = true, length = 20)
     private String employeeNo;
 
     @Column(name = "user_name", nullable = false, length = 100)
-    private String name;
+    private String userName;
 
     @Column(name = "user_email", nullable = false, unique = true, length = 255)
-    private String email;
+    private String userEmail;
 
     @Column(name = "user_pw", nullable = false, length = 255)
-    private String pw;
+    private String userPw;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false)
-    private Role role;
+    private Role userRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
@@ -44,7 +44,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_status", nullable = false)
-    private UserStatus status;
+    private UserStatus userStatus;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -53,25 +53,25 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(String employeeNo, String name, String email, String pw,
-                Role role, UserStatus status) {
+    public User(String employeeNo, String userName, String userEmail, String userPw,
+                Role userRole, UserStatus userStatus) {
         this.employeeNo = employeeNo;
-        this.name = name;
-        this.email = email;
-        this.pw = pw;
-        this.role = role;
-        this.status = status;
+        this.userName = userName;
+        this.userEmail = userEmail;
+        this.userPw = userPw;
+        this.userRole = userRole;
+        this.userStatus = userStatus;
     }
 
     public boolean canLogin() {
-        return this.status == UserStatus.재직;
+        return this.userStatus == UserStatus.ACTIVE;
     }
 
     public void changeStatus(UserStatus newStatus) {
-        if (this.status == UserStatus.퇴직) {
+        if (this.userStatus == UserStatus.RETIRED) {
             throw new IllegalStateException("퇴직한 사용자의 상태는 변경할 수 없습니다.");
         }
-        this.status = newStatus;
+        this.userStatus = newStatus;
     }
 
     public void assignDepartment(Department department) {
@@ -87,12 +87,12 @@ public class User {
     }
 
     public boolean isAdmin() {
-        return this.role == Role.ADMIN;
+        return this.userRole == Role.ADMIN;
     }
 
-    public void updateInfo(String name, String email) {
-        if (name != null) this.name = name;
-        if (email != null) this.email = email;
+    public void updateInfo(String userName, String userEmail) {
+        if (userName != null) this.userName = userName;
+        if (userEmail != null) this.userEmail = userEmail;
     }
 
     @PrePersist
