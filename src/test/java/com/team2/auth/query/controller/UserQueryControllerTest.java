@@ -1,8 +1,8 @@
 package com.team2.auth.query.controller;
 
-import com.team2.auth.entity.User;
-import com.team2.auth.entity.enums.Role;
-import com.team2.auth.entity.enums.UserStatus;
+import com.team2.auth.command.domain.entity.User;
+import com.team2.auth.command.domain.entity.enums.Role;
+import com.team2.auth.command.domain.entity.enums.UserStatus;
 import com.team2.auth.query.service.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

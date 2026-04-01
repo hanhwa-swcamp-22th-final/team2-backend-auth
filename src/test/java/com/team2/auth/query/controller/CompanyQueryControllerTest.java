@@ -1,6 +1,6 @@
 package com.team2.auth.query.controller;
 
-import com.team2.auth.entity.Company;
+import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.query.service.CompanyQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

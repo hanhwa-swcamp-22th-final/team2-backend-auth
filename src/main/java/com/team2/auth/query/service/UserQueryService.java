@@ -1,7 +1,7 @@
 package com.team2.auth.query.service;
 
-import com.team2.auth.entity.User;
-import com.team2.auth.entity.enums.UserStatus;
+import com.team2.auth.command.domain.entity.User;
+import com.team2.auth.command.domain.entity.enums.UserStatus;
 import com.team2.auth.query.mapper.UserQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -4,20 +4,20 @@
 
 <mapper namespace="com.team2.auth.query.mapper.UserQueryMapper">
 
-    <resultMap id="departmentResultMap" type="com.team2.auth.entity.Department">
+    <resultMap id="departmentResultMap" type="com.team2.auth.command.domain.entity.Department">
         <id property="departmentId" column="department_id"/>
         <result property="departmentName" column="department_name"/>
         <result property="createdAt" column="dept_created_at"/>
     </resultMap>
 
-    <resultMap id="positionResultMap" type="com.team2.auth.entity.Position">
+    <resultMap id="positionResultMap" type="com.team2.auth.command.domain.entity.Position">
         <id property="positionId" column="position_id"/>
         <result property="positionName" column="position_name"/>
         <result property="positionLevel" column="position_level"/>
         <result property="createdAt" column="pos_created_at"/>
     </resultMap>
 
-    <resultMap id="userResultMap" type="com.team2.auth.entity.User">
+    <resultMap id="userResultMap" type="com.team2.auth.command.domain.entity.User">
         <id property="userId" column="user_id"/>
         <result property="employeeNo" column="employee_no"/>
         <result property="userName" column="user_name"/>

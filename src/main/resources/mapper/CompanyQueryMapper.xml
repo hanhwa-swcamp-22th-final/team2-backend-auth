@@ -4,7 +4,7 @@
 
 <mapper namespace="com.team2.auth.query.mapper.CompanyQueryMapper">
 
-    <resultMap id="companyResultMap" type="com.team2.auth.entity.Company">
+    <resultMap id="companyResultMap" type="com.team2.auth.command.domain.entity.Company">
         <id property="companyId" column="company_id"/>
         <result property="companyName" column="company_name"/>
         <result property="companyAddressEn" column="company_address_en"/>

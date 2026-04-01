@@ -1,6 +1,6 @@
 package com.team2.auth.query.controller;
 
-import com.team2.auth.entity.Company;
+import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.query.service.CompanyQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

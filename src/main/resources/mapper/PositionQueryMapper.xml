@@ -4,7 +4,7 @@
 
 <mapper namespace="com.team2.auth.query.mapper.PositionQueryMapper">
 
-    <resultMap id="positionResultMap" type="com.team2.auth.entity.Position">
+    <resultMap id="positionResultMap" type="com.team2.auth.command.domain.entity.Position">
         <id property="positionId" column="position_id"/>
         <result property="positionName" column="position_name"/>
         <result property="positionLevel" column="position_level"/>

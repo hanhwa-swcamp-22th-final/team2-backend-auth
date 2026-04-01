@@ -48,7 +48,7 @@ server:
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.team2.auth.entity
+  type-aliases-package: com.team2.auth.command.domain.entity
 
 management:
   endpoints:

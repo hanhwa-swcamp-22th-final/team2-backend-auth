@@ -1,13 +1,14 @@
 package com.team2.auth.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team2.auth.dto.*;
-import com.team2.auth.entity.*;
-import com.team2.auth.entity.enums.Role;
-import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.command.repository.*;
+import com.team2.auth.command.application.dto.*;
+import com.team2.auth.query.dto.TokenResponse;
+import com.team2.auth.command.domain.entity.*;
+import com.team2.auth.command.domain.entity.enums.Role;
+import com.team2.auth.command.domain.entity.enums.UserStatus;
+import com.team2.auth.command.domain.repository.*;
 import com.team2.auth.security.JwtProvider;
-import com.team2.auth.command.service.*;
+import com.team2.auth.command.application.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;

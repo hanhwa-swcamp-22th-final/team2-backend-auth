@@ -1,6 +1,6 @@
 package com.team2.auth.query.mapper;
 
-import com.team2.auth.entity.Department;
+import com.team2.auth.command.domain.entity.Department;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

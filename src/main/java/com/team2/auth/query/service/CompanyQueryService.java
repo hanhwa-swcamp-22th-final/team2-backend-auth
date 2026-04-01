@@ -1,6 +1,6 @@
 package com.team2.auth.query.service;
 
-import com.team2.auth.entity.Company;
+import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.query.mapper.CompanyQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

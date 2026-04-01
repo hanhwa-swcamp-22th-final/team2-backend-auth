@@ -1,6 +1,6 @@
 package com.team2.auth.security;
 
-import com.team2.auth.entity.User;
+import com.team2.auth.command.domain.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

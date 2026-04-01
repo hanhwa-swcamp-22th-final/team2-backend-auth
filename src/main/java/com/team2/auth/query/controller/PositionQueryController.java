@@ -1,6 +1,6 @@
 package com.team2.auth.query.controller;
 
-import com.team2.auth.entity.Position;
+import com.team2.auth.command.domain.entity.Position;
 import com.team2.auth.query.service.PositionQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

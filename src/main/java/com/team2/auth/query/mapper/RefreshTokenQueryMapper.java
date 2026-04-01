@@ -1,6 +1,6 @@
 package com.team2.auth.query.mapper;
 
-import com.team2.auth.entity.RefreshToken;
+import com.team2.auth.command.domain.entity.RefreshToken;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

@@ -4,7 +4,7 @@
 
 <mapper namespace="com.team2.auth.query.mapper.DepartmentQueryMapper">
 
-    <resultMap id="departmentResultMap" type="com.team2.auth.entity.Department">
+    <resultMap id="departmentResultMap" type="com.team2.auth.command.domain.entity.Department">
         <id property="departmentId" column="department_id"/>
         <result property="departmentName" column="department_name"/>
         <result property="createdAt" column="created_at"/>

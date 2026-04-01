@@ -4,7 +4,7 @@
 
 <mapper namespace="com.team2.auth.query.mapper.RefreshTokenQueryMapper">
 
-    <resultMap id="userResultMap" type="com.team2.auth.entity.User">
+    <resultMap id="userResultMap" type="com.team2.auth.command.domain.entity.User">
         <id property="userId" column="user_id"/>
         <result property="employeeNo" column="employee_no"/>
         <result property="userName" column="user_name"/>
@@ -16,7 +16,7 @@
         <result property="updatedAt" column="user_updated_at"/>
     </resultMap>
 
-    <resultMap id="refreshTokenResultMap" type="com.team2.auth.entity.RefreshToken">
+    <resultMap id="refreshTokenResultMap" type="com.team2.auth.command.domain.entity.RefreshToken">
         <id property="refreshTokenId" column="refresh_token_id"/>
         <result property="tokenValue" column="token_value"/>
         <result property="tokenExpiresAt" column="token_expires_at"/>

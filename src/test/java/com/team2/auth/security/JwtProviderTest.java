@@ -2,10 +2,10 @@ package com.team2.auth.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team2.auth.entity.User;
-import com.team2.auth.entity.enums.Role;
-import com.team2.auth.entity.enums.UserStatus;
-import com.team2.auth.command.repository.UserRepository;
+import com.team2.auth.command.domain.entity.User;
+import com.team2.auth.command.domain.entity.enums.Role;
+import com.team2.auth.command.domain.entity.enums.UserStatus;
+import com.team2.auth.command.domain.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
