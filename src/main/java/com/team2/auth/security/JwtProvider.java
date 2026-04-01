@@ -31,11 +31,13 @@ public class JwtProvider {
 
     public String generateAccessToken(User user) {
         Date now = new Date();
+        Integer departmentId = user.getDepartment() != null ? user.getDepartment().getDepartmentId() : null;
         return Jwts.builder()
                 .subject(String.valueOf(user.getUserId()))
                 .claim("email", user.getUserEmail())
                 .claim("name", user.getUserName())
                 .claim("role", user.getUserRole().name())
+                .claim("departmentId", departmentId)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpiry))
                 .signWith(secretKey)
