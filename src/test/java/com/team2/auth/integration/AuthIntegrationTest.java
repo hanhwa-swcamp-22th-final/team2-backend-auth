@@ -238,7 +238,10 @@ class AuthIntegrationTest {
     void getAllUsers_success() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").isNumber())
+                .andExpect(jsonPath("$.totalPages").isNumber())
+                .andExpect(jsonPath("$.currentPage").value(0));
     }
 
     @Test

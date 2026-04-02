@@ -1,6 +1,7 @@
 package com.team2.auth.command.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team2.auth.command.application.dto.ChangePasswordRequest;
 import com.team2.auth.command.application.dto.ChangeStatusRequest;
 import com.team2.auth.command.application.dto.CreateUserRequest;
 import com.team2.auth.command.application.dto.UpdateUserRequest;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -121,5 +123,32 @@ class UserCommandControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userStatus").value("ON_LEAVE"));
+    }
+
+    @Test
+    @DisplayName("PUT /api/users/{id}/password - 비밀번호 변경 성공")
+    void changePassword_success() throws Exception {
+        // given
+        ChangePasswordRequest request = new ChangePasswordRequest("currentPw", "newPw123");
+
+        // when & then
+        mockMvc.perform(put("/api/users/1/password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(userCommandService).changePassword(1, "currentPw", "newPw123");
+    }
+
+    @Test
+    @DisplayName("POST /api/users/{id}/password/reset - 비밀번호 초기화 성공")
+    void resetPassword_success() throws Exception {
+        // when & then
+        mockMvc.perform(post("/api/users/1/password/reset")
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(userCommandService).resetPassword(1);
     }
 }

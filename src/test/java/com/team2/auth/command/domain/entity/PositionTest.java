@@ -58,6 +58,31 @@ class PositionTest {
     }
 
     @Test
+    @DisplayName("직급 정보 수정 성공: 이름과 레벨이 변경된다.")
+    void updateInfo_Success() {
+        // given
+        Position position = new Position("팀원", 2);
+        positionRepository.save(position);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Position found = positionRepository.findById(position.getPositionId()).orElseThrow();
+        found.updateInfo("팀장", 1);
+
+        // then
+        assertEquals("팀장", found.getPositionName());
+        assertEquals(1, found.getPositionLevel());
+
+        // DB 반영 후 재조회 검증
+        entityManager.flush();
+        entityManager.clear();
+        Position reloaded = positionRepository.findById(position.getPositionId()).orElseThrow();
+        assertEquals("팀장", reloaded.getPositionName());
+        assertEquals(1, reloaded.getPositionLevel());
+    }
+
+    @Test
     @DisplayName("결재 권한 확인: level=1이면 결재 권한을 보유한다.")
     void hasApprovalAuthority_Level1_ReturnsTrue() {
         // given

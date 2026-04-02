@@ -40,4 +40,27 @@ class DepartmentTest {
         // @PrePersist로 createdAt 자동설정 확인
         assertNotNull(found.getCreatedAt());
     }
+
+    @Test
+    @DisplayName("부서명 수정 성공: 부서명이 변경된다.")
+    void updateName_Success() {
+        // given
+        Department department = new Department("영업1팀");
+        departmentRepository.save(department);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Department found = departmentRepository.findById(department.getDepartmentId()).orElseThrow();
+        found.updateName("마케팅팀");
+
+        // then
+        assertEquals("마케팅팀", found.getDepartmentName());
+
+        // DB 반영 후 재조회 검증
+        entityManager.flush();
+        entityManager.clear();
+        Department reloaded = departmentRepository.findById(department.getDepartmentId()).orElseThrow();
+        assertEquals("마케팅팀", reloaded.getDepartmentName());
+    }
 }

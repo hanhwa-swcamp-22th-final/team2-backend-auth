@@ -1,6 +1,7 @@
 package com.team2.auth.service;
 
 import com.team2.auth.command.application.service.CompanyCommandService;
+import com.team2.auth.command.application.service.S3FileService;
 import com.team2.auth.command.application.dto.UpdateCompanyRequest;
 import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.command.domain.repository.CompanyRepository;
@@ -10,16 +11,24 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
 class CompanyServiceTest {
+
+    @MockitoBean
+    private S3FileService s3FileService;
 
     @Autowired
     private CompanyCommandService companyCommandService;
@@ -81,5 +90,25 @@ class CompanyServiceTest {
         assertThat(updated.getCompanyTel()).isEqualTo("02-9999-8888");
         // null로 보낸 필드는 기존 값 유지
         assertThat(updated.getCompanyAddressKr()).isEqualTo("서울시 강남구");
+    }
+
+    @Test
+    @DisplayName("직인 이미지를 업로드할 수 있다")
+    void uploadSealImage_success() {
+        // given
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "seal.png", "image/png", "fake-image-data".getBytes());
+        String expectedUrl = "https://team2-bucket.s3.amazonaws.com/company/seal/seal.png";
+        given(s3FileService.upload(eq("company/seal"), any())).willReturn(expectedUrl);
+
+        // when
+        String result = companyCommandService.uploadSealImage(file);
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        assertThat(result).isEqualTo(expectedUrl);
+        Company updated = companyRepository.findTopByOrderByCompanyIdAsc().orElseThrow();
+        assertThat(updated.getCompanySealImageUrl()).isEqualTo(expectedUrl);
     }
 }

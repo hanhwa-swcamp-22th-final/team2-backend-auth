@@ -1,5 +1,6 @@
 package com.team2.auth.service;
 
+import com.team2.auth.command.application.service.EmailService;
 import com.team2.auth.command.application.service.UserCommandService;
 import com.team2.auth.query.service.UserQueryService;
 import com.team2.auth.command.application.dto.CreateUserRequest;
@@ -18,19 +19,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.team2.auth.common.PagedResponse;
+import com.team2.auth.query.dto.UserListResponse;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
 class UserServiceTest {
+
+    @MockitoBean
+    private EmailService emailService;
 
     @Autowired
     private UserCommandService userCommandService;
@@ -280,5 +290,77 @@ class UserServiceTest {
 
         assertThat(activeUsers).hasSize(1);
         assertThat(activeUsers.get(0).getUserName()).isEqualTo("홍길동");
+    }
+
+    @Test
+    @DisplayName("비밀번호를 변경할 수 있다")
+    void changePassword_success() {
+        // when
+        userCommandService.changePassword(savedUser.getUserId(), "rawPassword", "newPassword");
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        User updated = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        assertThat(passwordEncoder.matches("newPassword", updated.getUserPw())).isTrue();
+    }
+
+    @Test
+    @DisplayName("현재 비밀번호가 일치하지 않으면 예외가 발생한다")
+    void changePassword_wrongCurrentPassword() {
+        assertThatThrownBy(() -> userCommandService.changePassword(savedUser.getUserId(), "wrongPassword", "newPassword"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("현재 비밀번호가 일치하지 않습니다");
+    }
+
+    @Test
+    @DisplayName("비밀번호를 초기화할 수 있다")
+    void resetPassword_success() {
+        // when
+        userCommandService.resetPassword(savedUser.getUserId());
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        User updated = userRepository.findById(savedUser.getUserId()).orElseThrow();
+        assertThat(passwordEncoder.matches("test1234", updated.getUserPw())).isTrue();
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 시 임시 비밀번호를 이메일로 발송한다")
+    void forgotPassword_success() {
+        // given
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        userCommandService.forgotPassword("hong@test.com");
+
+        // then
+        verify(emailService).sendTemporaryPassword(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 이메일로 비밀번호 찾기 시 예외가 발생한다")
+    void forgotPassword_unknownEmail() {
+        assertThatThrownBy(() -> userCommandService.forgotPassword("unknown@test.com"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("등록되지 않은 이메일");
+    }
+
+    @Test
+    @DisplayName("사용자 목록을 페이징하여 조회할 수 있다")
+    void getUsers_paged() {
+        // given
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        PagedResponse<UserListResponse> result = userQueryService.getUsers(null, null, null, null, 0, 10);
+
+        // then
+        assertThat(result.content()).isNotEmpty();
+        assertThat(result.totalElements()).isGreaterThan(0);
+        assertThat(result.currentPage()).isEqualTo(0);
     }
 }

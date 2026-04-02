@@ -379,6 +379,25 @@ class UserTest {
 
     // === 상태 변경 (추가) ===
 
+    // === 비밀번호 변경 ===
+
+    @Test
+    @DisplayName("비밀번호 변경: 새 비밀번호로 변경된다.")
+    void changePassword_Success() {
+        // given
+        User user = createDefaultUser();
+
+        // when
+        user.changePassword("newEncodedPassword");
+
+        // then
+        assertEquals("newEncodedPassword", user.getUserPw());
+
+        // DB 저장 후 재조회 검증
+        User found = saveAndReload(user);
+        assertEquals("newEncodedPassword", found.getUserPw());
+    }
+
     @Test
     @DisplayName("상태 변경 성공: 재직에서 퇴직으로 변경된다.")
     void changeStatus_fromActiveToRetired_success() {

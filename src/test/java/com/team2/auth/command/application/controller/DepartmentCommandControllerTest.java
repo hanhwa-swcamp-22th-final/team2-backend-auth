@@ -2,6 +2,7 @@ package com.team2.auth.command.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.command.application.dto.CreateDepartmentRequest;
+import com.team2.auth.command.application.dto.UpdateDepartmentRequest;
 import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.command.application.service.DepartmentCommandService;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -58,5 +60,22 @@ class DepartmentCommandControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(departmentCommandService).deleteDepartment(1);
+    }
+
+    @Test
+    @DisplayName("PUT /api/departments/{id} - 부서 수정 성공")
+    void updateDepartment_success() throws Exception {
+        // given
+        UpdateDepartmentRequest request = new UpdateDepartmentRequest("기획부");
+        given(departmentCommandService.updateDepartment(eq(1), eq("기획부")))
+                .willReturn(new Department("기획부"));
+
+        // when & then
+        mockMvc.perform(put("/api/departments/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.departmentName").value("기획부"));
     }
 }

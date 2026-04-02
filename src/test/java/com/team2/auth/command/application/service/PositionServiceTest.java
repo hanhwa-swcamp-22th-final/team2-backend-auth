@@ -68,6 +68,42 @@ class PositionServiceTest {
     }
 
     @Test
+    @DisplayName("직급 정보를 수정할 수 있다")
+    void updatePosition_success() {
+        // given
+        Position saved = positionCommandService.createPosition("팀원", 2);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Position result = positionCommandService.updatePosition(saved.getPositionId(), "팀장", 1);
+        entityManager.flush();
+        entityManager.clear();
+
+        // then - DB에서 다시 조회해서 확인
+        Position updated = positionRepository.findById(saved.getPositionId()).orElseThrow();
+        assertThat(updated.getPositionName()).isEqualTo("팀장");
+        assertThat(updated.getPositionLevel()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("직급을 삭제할 수 있다")
+    void deletePosition_success() {
+        // given
+        Position saved = positionCommandService.createPosition("팀원", 2);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        positionCommandService.deletePosition(saved.getPositionId());
+        entityManager.flush();
+        entityManager.clear();
+
+        // then - DB에서 삭제 확인
+        assertThat(positionRepository.findById(saved.getPositionId())).isEmpty();
+    }
+
+    @Test
     @DisplayName("ID로 직급을 조회할 수 있다")
     void getPosition_success() {
         Position saved = positionCommandService.createPosition("팀장", 1);

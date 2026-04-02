@@ -78,6 +78,24 @@ class DepartmentServiceTest {
     }
 
     @Test
+    @DisplayName("부서명을 수정할 수 있다")
+    void updateDepartment_success() {
+        // given
+        Department dept = departmentCommandService.createDepartment("영업부");
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Department result = departmentCommandService.updateDepartment(dept.getDepartmentId(), "마케팅부");
+        entityManager.flush();
+        entityManager.clear();
+
+        // then - DB에서 다시 조회해서 확인
+        Department updated = departmentRepository.findById(dept.getDepartmentId()).orElseThrow();
+        assertThat(updated.getDepartmentName()).isEqualTo("마케팅부");
+    }
+
+    @Test
     @DisplayName("소속 사용자가 없는 부서를 삭제할 수 있다")
     void deleteDepartment_success() {
         // given

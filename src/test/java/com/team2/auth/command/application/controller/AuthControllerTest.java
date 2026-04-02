@@ -1,11 +1,13 @@
 package com.team2.auth.command.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team2.auth.command.application.dto.ForgotPasswordRequest;
 import com.team2.auth.command.application.dto.LoginRequest;
 import com.team2.auth.command.application.dto.LogoutRequest;
 import com.team2.auth.command.application.dto.RefreshRequest;
 import com.team2.auth.query.dto.TokenResponse;
 import com.team2.auth.command.application.service.AuthService;
+import com.team2.auth.command.application.service.UserCommandService;
 import com.team2.auth.security.JwtProvider;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +39,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private UserCommandService userCommandService;
 
     @MockitoBean
     private JwtProvider jwtProvider;
@@ -142,5 +147,21 @@ class AuthControllerTest {
         mockMvc.perform(get("/api/auth/validate")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/forgot-password - 비밀번호 찾기 성공")
+    void forgotPassword_success() throws Exception {
+        // given
+        ForgotPasswordRequest request = new ForgotPasswordRequest("hong@test.com");
+
+        // when & then
+        mockMvc.perform(post("/api/auth/forgot-password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(userCommandService).forgotPassword("hong@test.com");
     }
 }

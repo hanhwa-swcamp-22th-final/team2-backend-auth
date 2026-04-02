@@ -26,16 +26,12 @@ public class UserQueryService {
         return user;
     }
 
-    public List<User> getAllUsers() {
-        return userQueryMapper.findAll();
-    }
-
     public List<User> getUsersByDepartment(Integer departmentId) {
         return userQueryMapper.findByDepartmentId(departmentId);
     }
 
     public List<User> getUsersByStatus(UserStatus userStatus) {
-        return userQueryMapper.findByUserStatus(userStatus.name());
+        return userQueryMapper.findByUserStatus(userStatus.getDbValue());
     }
 
     public boolean existsByUserEmail(String email) {
