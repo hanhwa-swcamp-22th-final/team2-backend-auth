@@ -2,12 +2,21 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/team2_auth
     username: root
-    password:
+    password: team2root
+    driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+  sql:
+    init:
+      mode: never
+
+  h2:
+    console:
+      enabled: false
 
   mail:
     host: smtp.gmail.com
