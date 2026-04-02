@@ -55,6 +55,7 @@ public class AuthService {
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshTokenValue)
+                .user(buildUserInfo(user))
                 .build();
     }
 
@@ -86,6 +87,17 @@ public class AuthService {
         return TokenResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshTokenValue)
+                .user(buildUserInfo(user))
+                .build();
+    }
+
+    private TokenResponse.UserInfo buildUserInfo(User user) {
+        return TokenResponse.UserInfo.builder()
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .userRole(user.getUserRole().name())
+                .departmentName(user.getDepartment() != null ? user.getDepartment().getDepartmentName() : null)
+                .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)
                 .build();
     }
 

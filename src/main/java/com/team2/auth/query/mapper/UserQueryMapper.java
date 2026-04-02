@@ -1,6 +1,7 @@
 package com.team2.auth.query.mapper;
 
 import com.team2.auth.command.domain.entity.User;
+import com.team2.auth.query.dto.UserListResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,16 @@ public interface UserQueryMapper {
     int existsByUserEmail(@Param("userEmail") String userEmail);
 
     int existsByEmployeeNo(@Param("employeeNo") String employeeNo);
+
+    List<UserListResponse> findByCondition(@Param("userName") String userName,
+                                           @Param("departmentId") Integer departmentId,
+                                           @Param("userRole") String userRole,
+                                           @Param("userStatus") String userStatus,
+                                           @Param("size") int size,
+                                           @Param("offset") int offset);
+
+    long countByCondition(@Param("userName") String userName,
+                          @Param("departmentId") Integer departmentId,
+                          @Param("userRole") String userRole,
+                          @Param("userStatus") String userStatus);
 }

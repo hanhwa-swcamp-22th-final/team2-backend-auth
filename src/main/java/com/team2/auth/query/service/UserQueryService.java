@@ -2,6 +2,8 @@ package com.team2.auth.query.service;
 
 import com.team2.auth.command.domain.entity.User;
 import com.team2.auth.command.domain.entity.enums.UserStatus;
+import com.team2.auth.common.PagedResponse;
+import com.team2.auth.query.dto.UserListResponse;
 import com.team2.auth.query.mapper.UserQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,5 +48,16 @@ public class UserQueryService {
 
     public User getUserByEmail(String email) {
         return userQueryMapper.findByUserEmail(email);
+    }
+
+    public PagedResponse<UserListResponse> getUsers(String userName, Integer departmentId,
+                                                     String userRole, String userStatus,
+                                                     int page, int size) {
+        int offset = page * size;
+        List<UserListResponse> content = userQueryMapper.findByCondition(
+                userName, departmentId, userRole, userStatus, size, offset);
+        long totalElements = userQueryMapper.countByCondition(
+                userName, departmentId, userRole, userStatus);
+        return PagedResponse.of(content, totalElements, page, size);
     }
 }

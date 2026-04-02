@@ -10,4 +10,16 @@ import lombok.Getter;
 public class TokenResponse {
     private String accessToken;
     private String refreshToken;
+    private UserInfo user;
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class UserInfo {
+        private Integer userId;
+        private String userName;
+        private String userRole;
+        private String departmentName;
+        private String positionName;
+    }
 }

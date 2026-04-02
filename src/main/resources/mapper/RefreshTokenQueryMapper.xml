@@ -10,8 +10,8 @@
         <result property="userName" column="user_name"/>
         <result property="userEmail" column="user_email"/>
         <result property="userPw" column="user_pw"/>
-        <result property="userRole" column="user_role"/>
-        <result property="userStatus" column="user_status"/>
+        <result property="userRole" column="user_role" typeHandler="com.team2.auth.config.RoleTypeHandler"/>
+        <result property="userStatus" column="user_status" typeHandler="com.team2.auth.config.UserStatusTypeHandler"/>
         <result property="createdAt" column="user_created_at"/>
         <result property="updatedAt" column="user_updated_at"/>
     </resultMap>

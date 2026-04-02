@@ -28,6 +28,10 @@ public class Department {
         this.departmentName = departmentName;
     }
 
+    public void updateName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

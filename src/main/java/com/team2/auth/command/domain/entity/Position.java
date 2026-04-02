@@ -35,6 +35,11 @@ public class Position {
         this.positionLevel = positionLevel;
     }
 
+    public void updateInfo(String positionName, int positionLevel) {
+        this.positionName = positionName;
+        this.positionLevel = positionLevel;
+    }
+
     public boolean hasApprovalAuthority() {
         return this.positionLevel == 1;
     }

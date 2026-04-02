@@ -1,10 +1,12 @@
 package com.team2.auth.command.application.controller;
 
+import com.team2.auth.command.application.dto.ForgotPasswordRequest;
 import com.team2.auth.command.application.dto.LoginRequest;
 import com.team2.auth.command.application.dto.LogoutRequest;
 import com.team2.auth.command.application.dto.RefreshRequest;
 import com.team2.auth.query.dto.TokenResponse;
 import com.team2.auth.command.application.service.AuthService;
+import com.team2.auth.command.application.service.UserCommandService;
 import com.team2.auth.security.JwtProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserCommandService userCommandService;
     private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
@@ -35,6 +38,12 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
         authService.logout(request.getUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        userCommandService.forgotPassword(request.getEmail());
         return ResponseEntity.ok().build();
     }
 

@@ -1,6 +1,7 @@
 package com.team2.auth.command.application.controller;
 
 import com.team2.auth.command.application.dto.CreateDepartmentRequest;
+import com.team2.auth.command.application.dto.UpdateDepartmentRequest;
 import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.command.application.service.DepartmentCommandService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,12 @@ public class DepartmentCommandController {
     public ResponseEntity<Department> createDepartment(@RequestBody CreateDepartmentRequest request) {
         Department department = departmentCommandService.createDepartment(request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(department);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Department> updateDepartment(@PathVariable Integer id,
+                                                       @RequestBody UpdateDepartmentRequest request) {
+        return ResponseEntity.ok(departmentCommandService.updateDepartment(id, request.getName()));
     }
 
     @DeleteMapping("/{id}")

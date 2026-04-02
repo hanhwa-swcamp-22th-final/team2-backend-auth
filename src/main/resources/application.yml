@@ -38,6 +38,17 @@ spring:
           starttls:
             enable: true
 
+# TODO: AWS S3 설정 - 실제 자격증명으로 교체 필요
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY:}
+      secret-key: ${AWS_SECRET_KEY:}
+    region:
+      static: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${AWS_S3_BUCKET:team2-bucket}
+
 jwt:
   secret: ${JWT_SECRET:myDefaultSecretKeyForDevelopmentMustBe256BitsLong!!}
   access-token-expiry: ${JWT_ACCESS_EXPIRY:3600000}
@@ -49,6 +60,7 @@ server:
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.team2.auth.command.domain.entity
+  type-handlers-package: com.team2.auth.config
 
 management:
   endpoints:

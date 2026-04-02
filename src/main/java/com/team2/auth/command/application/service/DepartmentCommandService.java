@@ -19,6 +19,13 @@ public class DepartmentCommandService {
         return departmentRepository.save(new Department(name));
     }
 
+    public Department updateDepartment(Integer id, String name) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
+        department.updateName(name);
+        return department;
+    }
+
     public void deleteDepartment(Integer id) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));

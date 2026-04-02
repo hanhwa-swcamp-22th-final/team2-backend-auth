@@ -1,5 +1,7 @@
 package com.team2.auth.command.domain.entity;
 
+import com.team2.auth.command.domain.entity.converter.RoleConverter;
+import com.team2.auth.command.domain.entity.converter.UserStatusConverter;
 import com.team2.auth.command.domain.entity.enums.Role;
 import com.team2.auth.command.domain.entity.enums.UserStatus;
 import jakarta.persistence.*;
@@ -30,7 +32,7 @@ public class User {
     @Column(name = "user_pw", nullable = false, length = 255)
     private String userPw;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = RoleConverter.class)
     @Column(name = "user_role", nullable = false)
     private Role userRole;
 
@@ -42,7 +44,7 @@ public class User {
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = UserStatusConverter.class)
     @Column(name = "user_status", nullable = false)
     private UserStatus userStatus;
 
@@ -93,6 +95,10 @@ public class User {
     public void updateInfo(String userName, String userEmail) {
         if (userName != null) this.userName = userName;
         if (userEmail != null) this.userEmail = userEmail;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.userPw = encodedPassword;
     }
 
     @PrePersist
