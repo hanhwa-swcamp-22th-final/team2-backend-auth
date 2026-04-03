@@ -5,8 +5,11 @@ import com.team2.auth.common.PagedResponse;
 import com.team2.auth.query.dto.UserListResponse;
 import com.team2.auth.query.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,7 +31,10 @@ public class UserQueryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Integer id) {
-        return ResponseEntity.ok(userQueryService.getUser(id));
+    public ResponseEntity<EntityModel<User>> getUser(@PathVariable Integer id) {
+        User user = userQueryService.getUser(id);
+        return ResponseEntity.ok(EntityModel.of(user,
+                linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel(),
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users")));
     }
 }

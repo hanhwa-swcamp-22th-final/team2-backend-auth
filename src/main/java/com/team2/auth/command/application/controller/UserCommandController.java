@@ -6,10 +6,15 @@ import com.team2.auth.command.application.dto.CreateUserRequest;
 import com.team2.auth.command.application.dto.UpdateUserRequest;
 import com.team2.auth.command.domain.entity.User;
 import com.team2.auth.command.application.service.UserCommandService;
+import com.team2.auth.query.controller.UserQueryController;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,15 +24,22 @@ public class UserCommandController {
     private final UserCommandService userCommandService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<EntityModel<User>> createUser(@RequestBody CreateUserRequest request) {
         User user = userCommandService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        EntityModel<User> model = EntityModel.of(user,
+                linkTo(methodOn(UserQueryController.class).getUser(user.getUserId())).withSelfRel(),
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users"));
+        URI location = linkTo(methodOn(UserQueryController.class).getUser(user.getUserId())).toUri();
+        return ResponseEntity.created(location).body(model);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id,
+    public ResponseEntity<EntityModel<User>> updateUser(@PathVariable Integer id,
                                            @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userCommandService.updateUser(id, request));
+        User user = userCommandService.updateUser(id, request);
+        return ResponseEntity.ok(EntityModel.of(user,
+                linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel(),
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users")));
     }
 
     @PutMapping("/{id}/password")
@@ -44,8 +56,10 @@ public class UserCommandController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<User> changeStatus(@PathVariable Integer id,
+    public ResponseEntity<EntityModel<User>> changeStatus(@PathVariable Integer id,
                                              @RequestBody ChangeStatusRequest request) {
-        return ResponseEntity.ok(userCommandService.changeStatus(id, request.getStatus()));
+        User user = userCommandService.changeStatus(id, request.getStatus());
+        return ResponseEntity.ok(EntityModel.of(user,
+                linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel()));
     }
 }

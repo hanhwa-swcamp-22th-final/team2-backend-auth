@@ -4,10 +4,15 @@ import com.team2.auth.command.application.dto.CreateDepartmentRequest;
 import com.team2.auth.command.application.dto.UpdateDepartmentRequest;
 import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.command.application.service.DepartmentCommandService;
+import com.team2.auth.query.controller.DepartmentQueryController;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -17,15 +22,20 @@ public class DepartmentCommandController {
     private final DepartmentCommandService departmentCommandService;
 
     @PostMapping
-    public ResponseEntity<Department> createDepartment(@RequestBody CreateDepartmentRequest request) {
+    public ResponseEntity<EntityModel<Department>> createDepartment(@RequestBody CreateDepartmentRequest request) {
         Department department = departmentCommandService.createDepartment(request.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(department);
+        EntityModel<Department> model = EntityModel.of(department,
+                linkTo(methodOn(DepartmentQueryController.class).getAllDepartments()).withRel("departments"));
+        URI location = linkTo(methodOn(DepartmentQueryController.class).getAllDepartments()).toUri();
+        return ResponseEntity.created(location).body(model);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Department> updateDepartment(@PathVariable Integer id,
+    public ResponseEntity<EntityModel<Department>> updateDepartment(@PathVariable Integer id,
                                                        @RequestBody UpdateDepartmentRequest request) {
-        return ResponseEntity.ok(departmentCommandService.updateDepartment(id, request.getName()));
+        Department dept = departmentCommandService.updateDepartment(id, request.getName());
+        return ResponseEntity.ok(EntityModel.of(dept,
+                linkTo(methodOn(DepartmentQueryController.class).getAllDepartments()).withRel("departments")));
     }
 
     @DeleteMapping("/{id}")
