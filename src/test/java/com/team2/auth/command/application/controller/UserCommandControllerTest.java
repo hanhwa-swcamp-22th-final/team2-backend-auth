@@ -56,7 +56,6 @@ class UserCommandControllerTest {
     void createUser_success() throws Exception {
         // given
         CreateUserRequest request = CreateUserRequest.builder()
-                .employeeNo("EMP001")
                 .name("홍길동")
                 .email("hong@test.com")
                 .password("password123")

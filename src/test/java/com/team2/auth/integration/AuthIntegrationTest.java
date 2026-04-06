@@ -206,28 +206,28 @@ class AuthIntegrationTest {
     @DisplayName("회원등록 성공")
     void createUser_success() throws Exception {
         CreateUserRequest req = CreateUserRequest.builder()
-                .employeeNo("EMP002").name("New").email("new@a.com").password("pw").role(Role.SALES).build();
+                .name("New").email("new@a.com").password("pw").role(Role.SALES).build();
         mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.employeeNo").value("EMP002"));
+                .andExpect(jsonPath("$.employeeNo").exists());
     }
 
     @Test
     @DisplayName("회원등록 실패 - 중복 이메일")
     void createUser_duplicateEmail_throwsViaServlet() {
         CreateUserRequest req = CreateUserRequest.builder()
-                .employeeNo("EMP003").name("Dup").email("test@example.com").password("pw").role(Role.SALES).build();
+                .name("Dup").email("test@example.com").password("pw").role(Role.SALES).build();
         assertThrows(ServletException.class,
                 () -> mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))));
     }
 
     @Test
-    @DisplayName("회원등록 실패 - 중복 사원번호")
-    void createUser_duplicateEmployeeNo_throwsViaServlet() {
+    @DisplayName("회원등록 실패 - 중복 이메일 (같은 이메일)")
+    void createUser_duplicateEmail2_throwsViaServlet() {
         CreateUserRequest req = CreateUserRequest.builder()
-                .employeeNo("EMP001").name("Dup").email("uniq@a.com").password("pw").role(Role.SALES).build();
+                .name("Dup").email("test@example.com").password("pw").role(Role.SALES).build();
         assertThrows(ServletException.class,
                 () -> mockMvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))));
