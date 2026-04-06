@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUserRequest {
-    @Schema(description = "사번", example = "EMP001")
-    private String employeeNo;
 
     @Schema(description = "사용자 이름", example = "홍길동")
     private String name;

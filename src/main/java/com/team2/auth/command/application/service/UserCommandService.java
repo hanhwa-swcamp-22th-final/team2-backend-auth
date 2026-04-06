@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +35,11 @@ public class UserCommandService {
         if (userQueryService.existsByUserEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
-        if (userQueryService.existsByEmployeeNo(request.getEmployeeNo())) {
-            throw new IllegalArgumentException("이미 사용 중인 사번입니다.");
-        }
+
+        String employeeNo = generateEmployeeNo();
 
         User user = User.builder()
-                .employeeNo(request.getEmployeeNo())
+                .employeeNo(employeeNo)
                 .userName(request.getName())
                 .userEmail(request.getEmail())
                 .userPw(passwordEncoder.encode(request.getPassword()))
@@ -47,6 +48,17 @@ public class UserCommandService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    private String generateEmployeeNo() {
+        String prefix = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+        int nextSeq = userRepository.findMaxEmployeeNoByPrefix(prefix)
+                .map(max -> Integer.parseInt(max.substring(6)) + 1)
+                .orElse(1);
+        if (nextSeq > 99) {
+            throw new IllegalStateException("당일 사번 발급 한도(99명)를 초과했습니다.");
+        }
+        return prefix + String.format("%02d", nextSeq);
     }
 
     public User updateUser(Integer id, UpdateUserRequest request) {
