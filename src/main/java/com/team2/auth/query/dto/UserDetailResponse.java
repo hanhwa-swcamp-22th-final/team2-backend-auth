@@ -35,8 +35,20 @@ public class UserDetailResponse {
     @Schema(description = "직급명", example = "과장")
     private String positionName;
 
+    @Schema(description = "직급 정보 (서비스 간 통신용)")
+    private PositionDetail position;
+
     @Schema(description = "사용자 상태", example = "ACTIVE")
     private String userStatus;
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PositionDetail {
+        @Schema(description = "직급 레벨 (1=팀장, 2=직원)", example = "1")
+        private Integer positionLevel;
+    }
 
     public static UserDetailResponse from(User user) {
         return UserDetailResponse.builder()
@@ -47,6 +59,9 @@ public class UserDetailResponse {
                 .userRole(user.getUserRole() != null ? user.getUserRole().name() : null)
                 .departmentName(user.getDepartment() != null ? user.getDepartment().getDepartmentName() : null)
                 .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)
+                .position(user.getPosition() != null
+                        ? PositionDetail.builder().positionLevel(user.getPosition().getPositionLevel()).build()
+                        : null)
                 .userStatus(user.getUserStatus() != null ? user.getUserStatus().name() : null)
                 .build();
     }
