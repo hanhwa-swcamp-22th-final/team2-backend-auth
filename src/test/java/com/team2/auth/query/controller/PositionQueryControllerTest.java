@@ -39,7 +39,7 @@ class PositionQueryControllerTest {
         // when & then
         mockMvc.perform(get("/api/positions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].positionName").value("팀장"))
-                .andExpect(jsonPath("$[1].positionName").value("팀원"));
+                .andExpect(jsonPath("$._embedded.positionList[0].positionName").value("팀장"))
+                .andExpect(jsonPath("$._embedded.positionList[1].positionName").value("팀원"));
     }
 }

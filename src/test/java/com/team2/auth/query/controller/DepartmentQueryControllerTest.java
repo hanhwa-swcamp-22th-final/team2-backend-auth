@@ -39,7 +39,7 @@ class DepartmentQueryControllerTest {
         // when & then
         mockMvc.perform(get("/api/departments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].departmentName").value("영업부"))
-                .andExpect(jsonPath("$[1].departmentName").value("생산부"));
+                .andExpect(jsonPath("$._embedded.departmentList[0].departmentName").value("영업부"))
+                .andExpect(jsonPath("$._embedded.departmentList[1].departmentName").value("생산부"));
     }
 }

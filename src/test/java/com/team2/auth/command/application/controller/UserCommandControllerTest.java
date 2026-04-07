@@ -61,7 +61,11 @@ class UserCommandControllerTest {
                 .password("password123")
                 .role(Role.SALES)
                 .build();
-        given(userCommandService.createUser(any(CreateUserRequest.class))).willReturn(createTestUser());
+        User createdUser = createTestUser();
+        java.lang.reflect.Field idField = User.class.getDeclaredField("userId");
+        idField.setAccessible(true);
+        idField.set(createdUser, 1);
+        given(userCommandService.createUser(any(CreateUserRequest.class))).willReturn(createdUser);
 
         // when & then
         mockMvc.perform(post("/api/users")

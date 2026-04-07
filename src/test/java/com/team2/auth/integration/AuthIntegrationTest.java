@@ -391,7 +391,7 @@ class AuthIntegrationTest {
     void getAllDepartments_success() throws Exception {
         mockMvc.perform(get("/api/departments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$._embedded.departmentList").isArray());
     }
 
     @Test
@@ -431,6 +431,6 @@ class AuthIntegrationTest {
     void getAllPositions_success() throws Exception {
         mockMvc.perform(get("/api/positions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$._embedded.positionList").isArray());
     }
 }
