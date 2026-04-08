@@ -3,6 +3,7 @@ package com.team2.auth.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.command.application.dto.*;
 import com.team2.auth.query.dto.TokenResponse;
+import jakarta.servlet.http.Cookie;
 import com.team2.auth.command.domain.entity.*;
 import com.team2.auth.command.domain.entity.enums.Role;
 import com.team2.auth.command.domain.entity.enums.UserStatus;
@@ -96,14 +97,17 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
-    @DisplayName("로그인 성공 - 이메일/패스워드로 유저 찾고 json 파싱해서 토큰 empty 아니면 로그인 성공")
+    @DisplayName("로그인 성공 - accessToken body 반환, RT는 HttpOnly 쿠키로 발급")
     void login_success() throws Exception {
         String body = objectMapper.writeValueAsString(new LoginRequest("test@example.com", "password123"));
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+                .andExpect(jsonPath("$.refreshToken").doesNotExist())
+                .andExpect(cookie().exists("sb_refresh_token"))
+                .andExpect(cookie().httpOnly("sb_refresh_token", true))
+                .andExpect(cookie().path("sb_refresh_token", "/api/auth"));
     }
 
     @Test
@@ -140,30 +144,36 @@ class AuthIntegrationTest {
     // ========================================================================
 
     @Test
-    @DisplayName("토큰 재발급 성공")
+    @DisplayName("토큰 재발급 성공 - RT 쿠키로 새 accessToken 발급 및 쿠키 회전")
     void refresh_success() throws Exception {
         TokenResponse loginResp = authService.login("test@example.com", "password123");
         entityManager.flush();
         entityManager.clear();
 
         mockMvc.perform(post("/api/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new RefreshRequest(loginResp.getRefreshToken()))))
+                .cookie(new Cookie("sb_refresh_token", loginResp.getRefreshToken())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+                .andExpect(jsonPath("$.refreshToken").doesNotExist())
+                .andExpect(cookie().exists("sb_refresh_token"));
     }
 
     @Test
-    @DisplayName("토큰 재발급 실패 - 유효하지 않은 토큰")
+    @DisplayName("토큰 재발급 실패 - 쿠키 없음 → 401")
+    void refresh_noCookie() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("토큰 재발급 실패 - 유효하지 않은 토큰 (쿠키)")
     void refresh_invalidToken_throwsViaServlet() {
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new RefreshRequest("invalid")))));
+                .cookie(new Cookie("sb_refresh_token", "invalid"))));
     }
 
     @Test
-    @DisplayName("토큰 재발급 실패 - 만료된 토큰")
+    @DisplayName("토큰 재발급 실패 - 만료된 토큰 (쿠키)")
     void refresh_expiredToken_throwsViaServlet() {
         User user = userRepository.findById(savedUser.getUserId()).orElseThrow();
         refreshTokenRepository.saveAndFlush(RefreshToken.builder()
@@ -171,8 +181,7 @@ class AuthIntegrationTest {
         entityManager.clear();
 
         assertThrows(ServletException.class, () -> mockMvc.perform(post("/api/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new RefreshRequest("expired-tok")))));
+                .cookie(new Cookie("sb_refresh_token", "expired-tok"))));
     }
 
     // ========================================================================

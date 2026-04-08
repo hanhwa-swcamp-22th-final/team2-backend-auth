@@ -3,7 +3,6 @@ package com.team2.auth.command.application.controller;
 import com.team2.auth.command.application.dto.ForgotPasswordRequest;
 import com.team2.auth.command.application.dto.LoginRequest;
 import com.team2.auth.command.application.dto.LogoutRequest;
-import com.team2.auth.command.application.dto.RefreshRequest;
 import com.team2.auth.query.dto.TokenResponse;
 import com.team2.auth.command.application.service.AuthService;
 import com.team2.auth.command.application.service.UserCommandService;
@@ -15,7 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +27,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private static final String COOKIE_NAME = "sb_refresh_token";
+
     private final AuthService authService;
     private final UserCommandService userCommandService;
     private final JwtProvider jwtProvider;
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하여 액세스 토큰과 리프레시 토큰을 발급받습니다.")
+    @Value("${auth.cookie.secure:true}")
+    private boolean cookieSecure;
+
+    @Value("${auth.cookie.same-site:Strict}")
+    private String cookieSameSite;
+
+    @Value("${jwt.refresh-token-expiry:604800000}")
+    private long refreshTokenExpiry;
+
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하여 액세스 토큰을 발급받습니다. 리프레시 토큰은 HttpOnly 쿠키로 설정됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -38,22 +51,31 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
         TokenResponse response = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(response);
+        ResponseCookie cookie = buildRefreshTokenCookie(response.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
-    @Operation(summary = "토큰 갱신", description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.")
+    @Operation(summary = "토큰 갱신", description = "sb_refresh_token 쿠키로 새로운 액세스 토큰을 발급받습니다. 리프레시 토큰도 회전 발급됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "토큰 갱신 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 리프레시 토큰")
+            @ApiResponse(responseCode = "401", description = "쿠키 없음 또는 유효하지 않은 리프레시 토큰")
     })
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshRequest request) {
-        TokenResponse response = authService.refreshToken(request.getRefreshToken());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TokenResponse> refresh(
+            @CookieValue(name = COOKIE_NAME, required = false) String refreshToken) {
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        TokenResponse response = authService.refreshToken(refreshToken);
+        ResponseCookie cookie = buildRefreshTokenCookie(response.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
-    @Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 삭제하여 로그아웃 처리합니다.")
+    @Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 삭제하고 쿠키를 만료시킵니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
@@ -61,7 +83,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
         authService.logout(request.getUserId());
-        return ResponseEntity.ok().build();
+        ResponseCookie cookie = buildExpiredCookie();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @Operation(summary = "비밀번호 찾기", description = "이메일로 임시 비밀번호를 발송합니다.")
@@ -101,6 +126,26 @@ public class AuthController {
                 .header("X-User-Name", claims.get("name", String.class))
                 .header("X-User-Role", claims.get("role", String.class))
                 .header("X-User-Department-Id", String.valueOf(claims.get("departmentId")))
+                .build();
+    }
+
+    private ResponseCookie buildRefreshTokenCookie(String token) {
+        return ResponseCookie.from(COOKIE_NAME, token)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
+                .path("/api/auth")
+                .maxAge(refreshTokenExpiry / 1000)
+                .build();
+    }
+
+    private ResponseCookie buildExpiredCookie() {
+        return ResponseCookie.from(COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
+                .path("/api/auth")
+                .maxAge(0)
                 .build();
     }
 }

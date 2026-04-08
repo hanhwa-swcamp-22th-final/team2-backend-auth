@@ -32,3 +32,8 @@ server:
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.team2.auth.entity
+
+auth:
+  cookie:
+    secure: false
+    same-site: Strict

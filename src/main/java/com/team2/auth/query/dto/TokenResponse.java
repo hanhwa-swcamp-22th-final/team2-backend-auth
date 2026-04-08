@@ -1,5 +1,6 @@
 package com.team2.auth.query.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ public class TokenResponse {
     @Schema(description = "액세스 토큰", example = "eyJhbGciOiJIUzI1NiJ9...")
     private String accessToken;
 
-    @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJIUzI1NiJ9...")
+    @JsonIgnore  // RT는 HttpOnly 쿠키로 전달 — 응답 body에 포함하지 않음
     private String refreshToken;
 
     @Schema(description = "로그인 사용자 정보")
