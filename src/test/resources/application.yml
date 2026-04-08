@@ -19,7 +19,10 @@ spring:
     port: 25
 
 jwt:
-  secret: testSecretKeyForJwtTestingPurposesMustBe256BitsLongEnough!!
+  rsa:
+    private-key-path: classpath:keys/test-private.pem
+    public-key-path: classpath:keys/test-public.pem
+  issuer: team2-auth-test
   access-token-expiry: 3600000
   refresh-token-expiry: 604800000
 

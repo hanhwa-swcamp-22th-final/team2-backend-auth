@@ -37,3 +37,11 @@ out/
 
 ### Env ###
 .env
+
+### RSA Keys (never commit private keys) ###
+src/main/resources/keys/
+/run/secrets/
+*.pem
+# Allow test keys (public repo only — rotate immediately if leaked)
+!src/test/resources/keys/test-public.pem
+!src/test/resources/keys/test-private.pem

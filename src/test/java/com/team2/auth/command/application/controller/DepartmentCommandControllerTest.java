@@ -5,6 +5,7 @@ import com.team2.auth.command.application.dto.CreateDepartmentRequest;
 import com.team2.auth.command.application.dto.UpdateDepartmentRequest;
 import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.command.application.service.DepartmentCommandService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ class DepartmentCommandControllerTest {
 
     @MockitoBean
     private DepartmentCommandService departmentCommandService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("POST /api/departments - 부서 생성 성공")

@@ -9,6 +9,7 @@ import com.team2.auth.command.domain.entity.User;
 import com.team2.auth.command.domain.entity.enums.Role;
 import com.team2.auth.command.domain.entity.enums.UserStatus;
 import com.team2.auth.command.application.service.UserCommandService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ class UserCommandControllerTest {
 
     @MockitoBean
     private UserCommandService userCommandService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     private User createTestUser() {
         return User.builder()

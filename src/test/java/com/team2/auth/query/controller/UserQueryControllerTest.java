@@ -6,6 +6,7 @@ import com.team2.auth.command.domain.entity.enums.UserStatus;
 import com.team2.auth.common.PagedResponse;
 import com.team2.auth.query.dto.UserListResponse;
 import com.team2.auth.query.service.UserQueryService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ class UserQueryControllerTest {
 
     @MockitoBean
     private UserQueryService userQueryService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     private UserListResponse createTestUserListResponse() {
         UserListResponse response = new UserListResponse();

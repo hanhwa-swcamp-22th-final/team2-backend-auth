@@ -2,6 +2,7 @@ package com.team2.auth.query.controller;
 
 import com.team2.auth.command.domain.entity.Position;
 import com.team2.auth.query.service.PositionQueryService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ class PositionQueryControllerTest {
 
     @MockitoBean
     private PositionQueryService positionQueryService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("GET /api/positions - 전체 직급 목록 조회")

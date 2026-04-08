@@ -2,6 +2,7 @@ package com.team2.auth.query.controller;
 
 import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.query.service.CompanyQueryService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ class CompanyQueryControllerTest {
 
     @MockitoBean
     private CompanyQueryService companyQueryService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("GET /api/company - 회사 정보 조회 성공")

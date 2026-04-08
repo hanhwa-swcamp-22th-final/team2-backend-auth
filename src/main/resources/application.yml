@@ -38,7 +38,6 @@ spring:
           starttls:
             enable: true
 
-# TODO: AWS S3 설정 - 실제 자격증명으로 교체 필요
 cloud:
   aws:
     credentials:
@@ -50,7 +49,12 @@ cloud:
       bucket: ${AWS_S3_BUCKET:team2-bucket}
 
 jwt:
-  secret: ${JWT_SECRET:myDefaultSecretKeyForDevelopmentMustBe256BitsLong!!}
+  rsa:
+    # Use file: prefix for filesystem paths, e.g. file:/run/secrets/private.pem
+    # Use classpath: prefix for classpath resources (tests only)
+    private-key-path: ${JWT_RSA_PRIVATE_KEY_PATH}
+    public-key-path: ${JWT_RSA_PUBLIC_KEY_PATH}
+  issuer: ${JWT_ISSUER:team2-auth}
   access-token-expiry: ${JWT_ACCESS_EXPIRY:3600000}
   refresh-token-expiry: ${JWT_REFRESH_EXPIRY:604800000}
 
