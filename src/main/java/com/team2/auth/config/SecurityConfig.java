@@ -50,7 +50,7 @@ public class SecurityConfig {
                     "/api/auth/validate",
                     "/.well-known/jwks.json",
                     "/actuator/health",
-                    "/actuator/**",
+                    "/actuator/info",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-ui.html",
