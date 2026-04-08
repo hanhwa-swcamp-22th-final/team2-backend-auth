@@ -10,8 +10,7 @@ spring:
 
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false  # dev profile에서만 true로 오버라이드
 
   jpa:
     hibernate:
