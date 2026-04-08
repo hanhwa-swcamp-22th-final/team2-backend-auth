@@ -2,10 +2,8 @@ package com.team2.auth.security;
 
 import com.team2.auth.command.domain.entity.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.IncorrectClaimException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MissingClaimException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -106,7 +104,8 @@ public class JwtProvider {
         try {
             parseAccessToken(token);
             return true;
-        } catch (MissingClaimException | IncorrectClaimException | JwtException | IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
+            // JwtException covers MissingClaimException, IncorrectClaimException, ExpiredJwtException etc.
             return false;
         }
     }
