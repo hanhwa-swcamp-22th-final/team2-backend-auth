@@ -4,6 +4,7 @@ import com.team2.auth.command.domain.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ public class JwtProvider {
     private final long refreshTokenExpiry;
     private final String issuer;
 
+    @Autowired
     public JwtProvider(
             RsaKeyProvider rsaKeyProvider,
             @Value("${jwt.access-token-expiry:3600000}") long accessTokenExpiry,
