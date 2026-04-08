@@ -2,8 +2,10 @@ package com.team2.auth.security;
 
 import com.team2.auth.command.domain.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.IncorrectClaimException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MissingClaimException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -94,6 +96,7 @@ public class JwtProvider {
     public Claims parseAccessToken(String token) {
         return Jwts.parser()
                 .verifyWith(publicKey)
+                .requireIssuer(issuer)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -103,7 +106,7 @@ public class JwtProvider {
         try {
             parseAccessToken(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (MissingClaimException | IncorrectClaimException | JwtException | IllegalArgumentException e) {
             return false;
         }
     }
