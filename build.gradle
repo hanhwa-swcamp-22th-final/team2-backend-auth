@@ -58,6 +58,9 @@ dependencies {
 
     // AWS S3
     implementation 'software.amazon.awssdk:s3:2.31.1'
+
+    // JWKS serialization
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
 }
 
 tasks.named('test') {

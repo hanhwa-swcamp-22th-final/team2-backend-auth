@@ -2,6 +2,7 @@ package com.team2.auth.query.controller;
 
 import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.query.service.DepartmentQueryService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ class DepartmentQueryControllerTest {
 
     @MockitoBean
     private DepartmentQueryService departmentQueryService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("GET /api/departments - 전체 부서 목록 조회")

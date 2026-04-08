@@ -1,10 +1,12 @@
 package com.team2.auth.config;
 
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -25,6 +27,9 @@ class SecurityConfigTest {
     @Autowired
     private CorsConfigurationSource corsConfigurationSource;
 
+    @MockitoBean
+    private JwtProvider jwtProvider;
+
     @Test
     @DisplayName("PasswordEncoder 빈이 BCryptPasswordEncoder이다")
     void passwordEncoder_isBCrypt() {
@@ -41,10 +46,11 @@ class SecurityConfigTest {
     }
 
     @Test
-    @DisplayName("CSRF가 비활성화되어 있다")
+    @DisplayName("CSRF가 비활성화되어 있다 (인증 없는 요청은 401)")
     void csrf_isDisabled() throws Exception {
+        // anyRequest().authenticated() → 401 when no credentials provided
         mockMvc.perform(get("/api/any-endpoint"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.auth.command.application.dto.UpdateCompanyRequest;
 import com.team2.auth.command.domain.entity.Company;
 import com.team2.auth.command.application.service.CompanyCommandService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class CompanyCommandControllerTest {
 
     @MockitoBean
     private CompanyCommandService companyCommandService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("PUT /api/company - 회사 정보 수정 성공")

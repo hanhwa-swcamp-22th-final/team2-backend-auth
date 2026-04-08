@@ -5,6 +5,7 @@ import com.team2.auth.command.application.dto.CreatePositionRequest;
 import com.team2.auth.command.application.dto.UpdatePositionRequest;
 import com.team2.auth.command.domain.entity.Position;
 import com.team2.auth.command.application.service.PositionCommandService;
+import com.team2.auth.security.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ class PositionCommandControllerTest {
 
     @MockitoBean
     private PositionCommandService positionCommandService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("POST /api/positions - 직급 생성 성공")
