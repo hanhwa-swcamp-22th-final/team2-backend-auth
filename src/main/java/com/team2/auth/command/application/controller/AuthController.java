@@ -6,10 +6,7 @@ import com.team2.auth.command.application.dto.LogoutRequest;
 import com.team2.auth.query.dto.TokenResponse;
 import com.team2.auth.command.application.service.AuthService;
 import com.team2.auth.command.application.service.UserCommandService;
-import com.team2.auth.security.JwtProvider;
-import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +28,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserCommandService userCommandService;
-    private final JwtProvider jwtProvider;
 
     @Value("${auth.cookie.secure:true}")
     private boolean cookieSecure;
@@ -99,34 +95,6 @@ public class AuthController {
     public ResponseEntity<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         userCommandService.forgotPassword(request.getEmail());
         return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "토큰 검증", description = "Authorization 헤더의 Bearer 토큰을 검증하고 사용자 정보를 응답 헤더에 포함합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "토큰 검증 성공"),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰")
-    })
-    @GetMapping("/validate")
-    public ResponseEntity<Void> validate(
-            @Parameter(description = "Bearer 액세스 토큰", example = "Bearer eyJhbGciOiJIUzI1NiJ9...")
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String token = authHeader.substring(7);
-        if (!jwtProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Claims claims = jwtProvider.parseAccessToken(token);
-        return ResponseEntity.ok()
-                .header("X-User-Id", claims.getSubject())
-                .header("X-User-Email", claims.get("email", String.class))
-                .header("X-User-Name", claims.get("name", String.class))
-                .header("X-User-Role", claims.get("role", String.class))
-                .header("X-User-Department-Id", String.valueOf(claims.get("departmentId")))
-                .build();
     }
 
     private ResponseCookie buildRefreshTokenCookie(String token) {
