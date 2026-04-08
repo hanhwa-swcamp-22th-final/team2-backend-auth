@@ -44,13 +44,18 @@ public class RsaKeyProvider {
         }
     }
 
+    // PKCS8 전용 (BEGIN PRIVATE KEY 헤더). PKCS1(BEGIN RSA PRIVATE KEY)는 지원 안 함.
+    // 키 생성 시 scripts/generate-rsa-keys.sh 사용 (openssl pkcs8 -topk8 -nocrypt 적용).
     private RSAPrivateKey loadPrivateKey(String path) throws Exception {
         String pem = readResource(path)
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
-                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-                .replace("-----END RSA PRIVATE KEY-----", "")
                 .replaceAll("\\s+", "");
+        if (pem.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Private key at [" + path + "] is empty or not in PKCS8 format. " +
+                    "Run scripts/generate-rsa-keys.sh to generate a compatible key.");
+        }
         byte[] decoded = Base64.getDecoder().decode(pem);
         return (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
