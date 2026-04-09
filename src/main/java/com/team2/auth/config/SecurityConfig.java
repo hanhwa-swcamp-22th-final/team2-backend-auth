@@ -32,9 +32,11 @@ public class SecurityConfig {
     private String allowedOrigins;
 
     private final JwtProvider jwtProvider;
+    private final InternalApiTokenFilter internalApiTokenFilter;
 
-    public SecurityConfig(JwtProvider jwtProvider) {
+    public SecurityConfig(JwtProvider jwtProvider, InternalApiTokenFilter internalApiTokenFilter) {
         this.jwtProvider = jwtProvider;
+        this.internalApiTokenFilter = internalApiTokenFilter;
     }
 
     @Bean
@@ -43,6 +45,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // InternalApiTokenFilter 는 JwtAuthFilter 보다 먼저 실행되어 /internal 경로의
+            // X-Internal-Token 헤더를 검증한다. 시스템 호출(Documents → Auth 등)을 위한 것.
+            .addFilterBefore(internalApiTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
@@ -58,6 +63,9 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/h2-console/**"
                 ).permitAll()
+                // /api/**\/internal/** 경로는 InternalApiTokenFilter 가 이미 X-Internal-Token 으로 검증했다.
+                // Gateway 에서는 동일 경로를 denyAll 로 외부 차단하므로 여기서는 permitAll 이 안전하다.
+                .requestMatchers("/api/users/internal/**").permitAll()
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
