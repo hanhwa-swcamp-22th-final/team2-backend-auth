@@ -49,7 +49,7 @@ public class PositionCommandController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<Position>> updatePosition(
-            @Parameter(description = "직급 ID") @PathVariable Integer id,
+            @Parameter(description = "직급 ID") @PathVariable("id") Integer id,
             @RequestBody UpdatePositionRequest request) {
         Position position = positionCommandService.updatePosition(id, request.getName(), request.getLevel());
         return ResponseEntity.ok(EntityModel.of(position,
@@ -63,7 +63,7 @@ public class PositionCommandController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePosition(
-            @Parameter(description = "직급 ID") @PathVariable Integer id) {
+            @Parameter(description = "직급 ID") @PathVariable("id") Integer id) {
         positionCommandService.deletePosition(id);
         return ResponseEntity.noContent().build();
     }

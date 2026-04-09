@@ -48,7 +48,7 @@ public class CompanyCommandController {
     @PostMapping("/seal")
     public ResponseEntity<Map<String, String>> uploadSeal(
             @Parameter(description = "업로드할 직인 이미지 파일")
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam(name = "file", "file") MultipartFile file) {
         String imageUrl = companyCommandService.uploadSealImage(file);
         return ResponseEntity.ok(Map.of(
                 "companySealImageUrl", imageUrl,

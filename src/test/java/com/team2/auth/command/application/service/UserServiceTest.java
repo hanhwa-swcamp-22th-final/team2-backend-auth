@@ -337,11 +337,16 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("등록되지 않은 이메일로 비밀번호 찾기 시 예외가 발생한다")
+    @DisplayName("등록되지 않은 이메일로 비밀번호 찾기 시 silent ack 로 처리한다 (account enumeration 방어)")
     void forgotPassword_unknownEmail() {
-        assertThatThrownBy(() -> userCommandService.forgotPassword("unknown@test.com"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("등록되지 않은 이메일");
+        // 계정 열거 방어를 위해 미존재 이메일도 예외 없이 정상 종료되어야 한다.
+        userCommandService.forgotPassword("unknown@test.com");
+
+        // 메일 발송은 수행되지 않는다.
+        org.mockito.Mockito.verify(emailService, org.mockito.Mockito.never())
+                .sendTemporaryPassword(org.mockito.ArgumentMatchers.anyString(),
+                        org.mockito.ArgumentMatchers.anyString(),
+                        org.mockito.ArgumentMatchers.anyString());
     }
 
     @Test

@@ -54,7 +54,7 @@ public class UserCommandController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<UserDetailResponse>> updateUser(
-            @Parameter(description = "사용자 ID") @PathVariable Integer id,
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id,
             @RequestBody UpdateUserRequest request) {
         User user = userCommandService.updateUser(id, request);
         return ResponseEntity.ok(EntityModel.of(UserDetailResponse.from(user),
@@ -70,7 +70,7 @@ public class UserCommandController {
     })
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(
-            @Parameter(description = "사용자 ID") @PathVariable Integer id,
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id,
             @RequestBody ChangePasswordRequest request) {
         userCommandService.changePassword(id, request.getCurrentPw(), request.getNewPw());
         return ResponseEntity.ok().build();
@@ -83,7 +83,7 @@ public class UserCommandController {
     })
     @PostMapping("/{id}/password/reset")
     public ResponseEntity<Void> resetPassword(
-            @Parameter(description = "사용자 ID") @PathVariable Integer id) {
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id) {
         userCommandService.resetPassword(id);
         return ResponseEntity.ok().build();
     }
@@ -96,7 +96,7 @@ public class UserCommandController {
     })
     @PatchMapping("/{id}/status")
     public ResponseEntity<EntityModel<UserDetailResponse>> changeStatus(
-            @Parameter(description = "사용자 ID") @PathVariable Integer id,
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id,
             @RequestBody ChangeStatusRequest request) {
         User user = userCommandService.changeStatus(id, request.getStatus());
         return ResponseEntity.ok(EntityModel.of(UserDetailResponse.from(user),

@@ -31,12 +31,12 @@ public class UserQueryController {
     })
     @GetMapping
     public ResponseEntity<PagedResponse<UserListResponse>> getUsers(
-            @Parameter(description = "사용자 이름 (부분 검색)") @RequestParam(required = false) String userName,
-            @Parameter(description = "부서 ID") @RequestParam(required = false) Integer departmentId,
-            @Parameter(description = "사용자 역할 (ADMIN, USER 등)") @RequestParam(required = false) String userRole,
-            @Parameter(description = "사용자 상태 (ACTIVE, INACTIVE 등)") @RequestParam(required = false) String userStatus,
-            @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") int size) {
+            @Parameter(description = "사용자 이름 (부분 검색)") @RequestParam(name = "userName", required = false) String userName,
+            @Parameter(description = "부서 ID") @RequestParam(name = "departmentId", required = false) Integer departmentId,
+            @Parameter(description = "사용자 역할 (ADMIN, USER 등)") @RequestParam(name = "userRole", required = false) String userRole,
+            @Parameter(description = "사용자 상태 (ACTIVE, INACTIVE 등)") @RequestParam(name = "userStatus", required = false) String userStatus,
+            @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(name = "page", defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기") @RequestParam(name = "size", defaultValue = "10") int size) {
         return ResponseEntity.ok(userQueryService.getUsers(
                 userName, departmentId, userRole, userStatus, page, size));
     }
@@ -48,7 +48,7 @@ public class UserQueryController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<UserDetailResponse>> getUser(
-            @Parameter(description = "사용자 ID") @PathVariable Integer id) {
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id) {
         User user = userQueryService.getUser(id);
         UserDetailResponse response = UserDetailResponse.from(user);
         return ResponseEntity.ok(EntityModel.of(response,

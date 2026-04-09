@@ -49,7 +49,7 @@ public class DepartmentCommandController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<Department>> updateDepartment(
-            @Parameter(description = "부서 ID") @PathVariable Integer id,
+            @Parameter(description = "부서 ID") @PathVariable("id") Integer id,
             @RequestBody UpdateDepartmentRequest request) {
         Department dept = departmentCommandService.updateDepartment(id, request.getName());
         return ResponseEntity.ok(EntityModel.of(dept,
@@ -63,7 +63,7 @@ public class DepartmentCommandController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDepartment(
-            @Parameter(description = "부서 ID") @PathVariable Integer id) {
+            @Parameter(description = "부서 ID") @PathVariable("id") Integer id) {
         departmentCommandService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
     }
