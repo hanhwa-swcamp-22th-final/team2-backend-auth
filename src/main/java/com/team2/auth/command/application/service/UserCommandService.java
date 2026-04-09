@@ -11,6 +11,7 @@ import com.team2.auth.command.domain.repository.PositionRepository;
 import com.team2.auth.command.domain.repository.UserRepository;
 import com.team2.auth.query.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class UserCommandService {
@@ -102,13 +104,23 @@ public class UserCommandService {
 
     public void forgotPassword(String email) {
         User user = userQueryService.getUserByEmail(email);
+        // 계정 열거 공격 방어: 존재하지 않는 이메일이어도 동일한 200 OK 응답을 위해 조용히 종료한다.
+        // 응답 차이로 이메일 존재 여부를 추론할 수 없게 한다.
         if (user == null) {
-            throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
+            log.warn("forgot-password 요청: 존재하지 않는 이메일 — silent ack 처리");
+            return;
         }
 
         String tempPassword = generateTempPassword();
         user.changePassword(passwordEncoder.encode(tempPassword));
-        emailService.sendTemporaryPassword(user.getUserEmail(), user.getUserName(), tempPassword);
+        try {
+            emailService.sendTemporaryPassword(user.getUserEmail(), user.getUserName(), tempPassword);
+        } catch (Exception e) {
+            // 메일 발송 실패 시 비밀번호 변경을 롤백하기 위해 예외를 그대로 전파한다.
+            // (클래스 레벨 @Transactional 이 작동)
+            log.error("비밀번호 초기화 메일 발송 실패 — 트랜잭션 롤백 예정: {}", e.getMessage());
+            throw new IllegalStateException("메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.", e);
+        }
     }
 
     private String generateTempPassword() {
