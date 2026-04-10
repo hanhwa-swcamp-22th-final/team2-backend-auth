@@ -94,7 +94,9 @@ public class AuthService {
     private TokenResponse.UserInfo buildUserInfo(User user) {
         return TokenResponse.UserInfo.builder()
                 .userId(user.getUserId())
+                .employeeNo(user.getEmployeeNo())
                 .userName(user.getUserName())
+                .userEmail(user.getUserEmail())
                 .userRole(user.getUserRole().name())
                 .departmentName(user.getDepartment() != null ? user.getDepartment().getDepartmentName() : null)
                 .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)

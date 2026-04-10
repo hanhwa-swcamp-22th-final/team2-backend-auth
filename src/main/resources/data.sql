@@ -17,7 +17,7 @@ INSERT INTO positions (position_name, position_level, created_at) VALUES ('팀�
 
 -- ADMIN (경영지원부 팀장)
 INSERT INTO users (employee_no, user_name, user_email, user_pw, user_role, user_status, department_id, position_id, created_at, updated_at)
-VALUES ('26030101', '관리자', 'admin@hanwha.com', '$2a$10$D9NYuK6QaSwPFM0fnBN9gOHr8.xWmZyimaUxJUt7yiw69nDyQErXm', 'admin', 'active', 4, 1, NOW(), NOW());
+VALUES ('26030101', '최관리', 'admin@hanwha.com', '$2a$10$D9NYuK6QaSwPFM0fnBN9gOHr8.xWmZyimaUxJUt7yiw69nDyQErXm', 'admin', 'active', 4, 1, NOW(), NOW());
 
 -- 영업부
 INSERT INTO users (employee_no, user_name, user_email, user_pw, user_role, user_status, department_id, position_id, created_at, updated_at)

@@ -53,7 +53,7 @@ public class InternalUserQueryController {
                 userQueryService.getUsers(null, null, role, userStatus, 0, limit);
 
         // email 이 blank 인 항목 필터링
-        List<UserListResponse> filtered = page.getContent().stream()
+        List<UserListResponse> filtered = page.content().stream()
                 .filter(u -> u.getUserEmail() != null && !u.getUserEmail().isBlank())
                 .toList();
 

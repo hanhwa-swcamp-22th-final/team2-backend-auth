@@ -28,8 +28,14 @@ public class TokenResponse {
         @Schema(description = "사용자 ID", example = "1")
         private Integer userId;
 
+        @Schema(description = "사번", example = "EMP001")
+        private String employeeNo;
+
         @Schema(description = "사용자 이름", example = "홍길동")
         private String userName;
+
+        @Schema(description = "이메일", example = "hong@example.com")
+        private String userEmail;
 
         @Schema(description = "사용자 역할", example = "ADMIN")
         private String userRole;
