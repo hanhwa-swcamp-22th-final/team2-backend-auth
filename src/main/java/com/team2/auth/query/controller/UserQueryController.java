@@ -42,7 +42,8 @@ public class UserQueryController {
             @Parameter(description = "페이지 크기") @RequestParam(name = "size", defaultValue = "10") int size) {
         PagedResponse<UserListResponse> result = userQueryService.getUsers(
                 userName, departmentId, userRole, userStatus, page, size);
-        List<EntityModel<UserListResponse>> models = result.content().stream()
+        List<UserListResponse> content = result.content() != null ? result.content() : List.of();
+        List<EntityModel<UserListResponse>> models = content.stream()
                 .map(EntityModel::of).toList();
         PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, result.totalElements());
         return ResponseEntity.ok(PagedModel.of(models, metadata));
