@@ -101,15 +101,15 @@
     </select>
 
     <sql id="userListColumns">
-        u.user_id,
-        u.employee_no,
-        u.user_name,
-        u.user_email,
-        u.user_role,
-        u.user_status,
-        u.created_at,
-        d.department_name,
-        p.position_name
+        u.user_id       AS userId,
+        u.employee_no   AS employeeNo,
+        u.user_name     AS userName,
+        u.user_email    AS userEmail,
+        u.user_role     AS userRole,
+        u.user_status   AS userStatus,
+        u.created_at    AS createdAt,
+        d.department_name AS departmentName,
+        p.position_name AS positionName
     </sql>
 
     <sql id="userFilterConditions">

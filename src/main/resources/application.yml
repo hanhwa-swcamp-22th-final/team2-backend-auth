@@ -68,6 +68,8 @@ mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.team2.auth.command.domain.entity
   type-handlers-package: com.team2.auth.config
+  configuration:
+    map-underscore-to-camel-case: true
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8001}
