@@ -42,10 +42,13 @@ public class UserQueryController {
             @Parameter(description = "페이지 크기") @RequestParam(name = "size", defaultValue = "10") int size) {
         PagedResponse<UserListResponse> result = userQueryService.getUsers(
                 userName, departmentId, userRole, userStatus, page, size);
-        List<UserListResponse> content = result.content() != null ? result.content() : List.of();
+        List<UserListResponse> content = result != null && result.content() != null
+                ? result.content() : List.of();
         List<EntityModel<UserListResponse>> models = content.stream()
+                .filter(java.util.Objects::nonNull)
                 .map(EntityModel::of).toList();
-        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, result.totalElements());
+        long total = result != null ? result.totalElements() : 0;
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, total);
         return ResponseEntity.ok(PagedModel.of(models, metadata));
     }
 
