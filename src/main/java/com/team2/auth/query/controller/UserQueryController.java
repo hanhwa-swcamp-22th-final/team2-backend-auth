@@ -12,8 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -30,15 +33,19 @@ public class UserQueryController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping
-    public ResponseEntity<PagedResponse<UserListResponse>> getUsers(
+    public ResponseEntity<PagedModel<EntityModel<UserListResponse>>> getUsers(
             @Parameter(description = "사용자 이름 (부분 검색)") @RequestParam(name = "userName", required = false) String userName,
             @Parameter(description = "부서 ID") @RequestParam(name = "departmentId", required = false) Integer departmentId,
             @Parameter(description = "사용자 역할 (ADMIN, USER 등)") @RequestParam(name = "userRole", required = false) String userRole,
             @Parameter(description = "사용자 상태 (ACTIVE, INACTIVE 등)") @RequestParam(name = "userStatus", required = false) String userStatus,
             @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(name = "page", defaultValue = "0") int page,
             @Parameter(description = "페이지 크기") @RequestParam(name = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok(userQueryService.getUsers(
-                userName, departmentId, userRole, userStatus, page, size));
+        PagedResponse<UserListResponse> result = userQueryService.getUsers(
+                userName, departmentId, userRole, userStatus, page, size);
+        List<EntityModel<UserListResponse>> models = result.content().stream()
+                .map(EntityModel::of).toList();
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, result.totalElements());
+        return ResponseEntity.ok(PagedModel.of(models, metadata));
     }
 
     @Operation(summary = "사용자 상세 조회", description = "사용자 ID로 상세 정보를 조회합니다.")
