@@ -46,11 +46,13 @@ public class InternalUserQueryController {
             @RequestParam(name = "role") String role,
             @Parameter(description = "사용자 상태 필터 DB 값 (기본 active)")
             @RequestParam(name = "userStatus", required = false, defaultValue = "active") String userStatus,
+            @Parameter(description = "부서 ID 필터 (선택)")
+            @RequestParam(name = "departmentId", required = false) Integer departmentId,
             @Parameter(description = "최대 반환 수")
             @RequestParam(name = "limit", required = false, defaultValue = "200") int limit) {
         // findByCondition 을 재사용 — 내부 호출이므로 단일 페이지(size=limit) 로 조회
         PagedResponse<UserListResponse> page =
-                userQueryService.getUsers(null, null, role, userStatus, 0, limit);
+                userQueryService.getUsers(null, departmentId, role, userStatus, 0, limit);
 
         // email 이 blank 인 항목 필터링
         List<UserListResponse> filtered = page.content().stream()
