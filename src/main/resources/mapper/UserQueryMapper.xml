@@ -10,6 +10,13 @@
         <result property="createdAt" column="dept_created_at"/>
     </resultMap>
 
+    <resultMap id="teamResultMap" type="com.team2.auth.command.domain.entity.Team">
+        <id property="teamId" column="team_id"/>
+        <result property="teamName" column="team_name"/>
+        <result property="createdAt" column="team_created_at"/>
+        <association property="department" resultMap="departmentResultMap"/>
+    </resultMap>
+
     <resultMap id="positionResultMap" type="com.team2.auth.command.domain.entity.Position">
         <id property="positionId" column="position_id"/>
         <result property="positionName" column="position_name"/>
@@ -27,7 +34,7 @@
         <result property="userStatus" column="user_status" typeHandler="com.team2.auth.config.UserStatusTypeHandler"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
-        <association property="department" resultMap="departmentResultMap"/>
+        <association property="team" resultMap="teamResultMap"/>
         <association property="position" resultMap="positionResultMap"/>
     </resultMap>
 
@@ -41,6 +48,9 @@
         u.user_status,
         u.created_at,
         u.updated_at,
+        t.team_id,
+        t.team_name,
+        t.created_at AS team_created_at,
         d.department_id,
         d.department_name,
         d.created_at AS dept_created_at,
@@ -52,7 +62,8 @@
 
     <sql id="userJoins">
         FROM users u
-        LEFT JOIN departments d ON u.department_id = d.department_id
+        LEFT JOIN teams t ON u.team_id = t.team_id
+        LEFT JOIN departments d ON t.department_id = d.department_id
         LEFT JOIN positions p ON u.position_id = p.position_id
     </sql>
 
@@ -84,11 +95,19 @@
         ORDER BY u.user_id
     </select>
 
+    <select id="findByTeamId" resultMap="userResultMap">
+        SELECT
+        <include refid="userColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.team_id = #{teamId}
+        ORDER BY u.user_id
+    </select>
+
     <select id="findByDepartmentId" resultMap="userResultMap">
         SELECT
         <include refid="userColumns"/>
         <include refid="userJoins"/>
-        WHERE u.department_id = #{departmentId}
+        WHERE t.department_id = #{departmentId}
         ORDER BY u.user_id
     </select>
 
@@ -108,6 +127,9 @@
         u.user_role     AS userRole,
         u.user_status   AS userStatus,
         u.created_at    AS createdAt,
+        t.team_id       AS teamId,
+        t.team_name     AS teamName,
+        d.department_id AS departmentId,
         d.department_name AS departmentName,
         p.position_name AS positionName
     </sql>
@@ -117,8 +139,11 @@
             <if test="userName != null and userName != ''">
                 AND u.user_name LIKE CONCAT('%', #{userName}, '%')
             </if>
+            <if test="teamId != null">
+                AND u.team_id = #{teamId}
+            </if>
             <if test="departmentId != null">
-                AND u.department_id = #{departmentId}
+                AND t.department_id = #{departmentId}
             </if>
             <if test="userRole != null and userRole != ''">
                 AND u.user_role = #{userRole}
@@ -141,6 +166,7 @@
     <select id="countByCondition" resultType="long">
         SELECT COUNT(*)
         FROM users u
+        LEFT JOIN teams t ON u.team_id = t.team_id
         <include refid="userFilterConditions"/>
     </select>
 

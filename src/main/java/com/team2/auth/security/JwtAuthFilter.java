@@ -39,10 +39,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String email = claims.get("email", String.class);
         String name = claims.get("name", String.class);
         String role = claims.get("role", String.class);
+        Object teamIdObj = claims.get("teamId");
+        Integer teamId = teamIdObj instanceof Number ? ((Number) teamIdObj).intValue() : null;
         Object deptIdObj = claims.get("departmentId");
         Integer departmentId = deptIdObj instanceof Number ? ((Number) deptIdObj).intValue() : null;
 
-        AuthUser authUser = new AuthUser(userId, email, name, role, departmentId);
+        AuthUser authUser = new AuthUser(userId, email, name, role, teamId, departmentId);
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);

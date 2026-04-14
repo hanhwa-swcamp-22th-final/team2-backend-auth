@@ -35,13 +35,14 @@ public class UserQueryController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<UserListResponse>>> getUsers(
             @Parameter(description = "사용자 이름 (부분 검색)") @RequestParam(name = "userName", required = false) String userName,
-            @Parameter(description = "부서 ID") @RequestParam(name = "departmentId", required = false) Integer departmentId,
+            @Parameter(description = "팀 ID") @RequestParam(name = "teamId", required = false) Integer teamId,
+            @Parameter(description = "부서 ID (팀 경유 필터)") @RequestParam(name = "departmentId", required = false) Integer departmentId,
             @Parameter(description = "사용자 역할 (ADMIN, USER 등)") @RequestParam(name = "userRole", required = false) String userRole,
             @Parameter(description = "사용자 상태 (ACTIVE, INACTIVE 등)") @RequestParam(name = "userStatus", required = false) String userStatus,
             @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(name = "page", defaultValue = "0") int page,
             @Parameter(description = "페이지 크기") @RequestParam(name = "size", defaultValue = "10") int size) {
         PagedResponse<UserListResponse> result = userQueryService.getUsers(
-                userName, departmentId, userRole, userStatus, page, size);
+                userName, teamId, departmentId, userRole, userStatus, page, size);
         List<UserListResponse> content = result != null && result.content() != null
                 ? result.content() : List.of();
         List<EntityModel<UserListResponse>> models = content.stream()
@@ -64,6 +65,6 @@ public class UserQueryController {
         UserDetailResponse response = UserDetailResponse.from(user);
         return ResponseEntity.ok(EntityModel.of(response,
                 linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel(),
-                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users")));
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, null, 0, 10)).withRel("users")));
     }
 }

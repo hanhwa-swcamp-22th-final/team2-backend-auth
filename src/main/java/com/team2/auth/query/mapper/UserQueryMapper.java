@@ -18,6 +18,8 @@ public interface UserQueryMapper {
 
     List<User> findAll();
 
+    List<User> findByTeamId(@Param("teamId") Integer teamId);
+
     List<User> findByDepartmentId(@Param("departmentId") Integer departmentId);
 
     List<User> findByUserStatus(@Param("userStatus") String userStatus);
@@ -27,6 +29,7 @@ public interface UserQueryMapper {
     int existsByEmployeeNo(@Param("employeeNo") String employeeNo);
 
     List<UserListResponse> findByCondition(@Param("userName") String userName,
+                                           @Param("teamId") Integer teamId,
                                            @Param("departmentId") Integer departmentId,
                                            @Param("userRole") String userRole,
                                            @Param("userStatus") String userStatus,
@@ -34,6 +37,7 @@ public interface UserQueryMapper {
                                            @Param("offset") int offset);
 
     long countByCondition(@Param("userName") String userName,
+                          @Param("teamId") Integer teamId,
                           @Param("departmentId") Integer departmentId,
                           @Param("userRole") String userRole,
                           @Param("userStatus") String userStatus);

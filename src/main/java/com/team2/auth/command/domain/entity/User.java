@@ -37,8 +37,8 @@ public class User {
     private Role userRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
@@ -76,8 +76,8 @@ public class User {
         this.userStatus = newStatus;
     }
 
-    public void assignDepartment(Department department) {
-        this.department = department;
+    public void assignTeam(Team team) {
+        this.team = team;
     }
 
     public void assignPosition(Position position) {
@@ -90,6 +90,11 @@ public class User {
 
     public boolean isAdmin() {
         return this.userRole == Role.ADMIN;
+    }
+
+    /** 팀을 통해 소속 부서를 조회 (null safe). */
+    public Department getDepartment() {
+        return this.team != null ? this.team.getDepartment() : null;
     }
 
     public void updateInfo(String userName, String userEmail) {

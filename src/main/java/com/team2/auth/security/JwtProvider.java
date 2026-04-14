@@ -70,6 +70,7 @@ public class JwtProvider {
 
     public String generateAccessToken(User user) {
         Date now = new Date();
+        Integer teamId = user.getTeam() != null ? user.getTeam().getTeamId() : null;
         Integer departmentId = user.getDepartment() != null ? user.getDepartment().getDepartmentId() : null;
         return Jwts.builder()
                 .header().keyId(kid).and()
@@ -78,6 +79,7 @@ public class JwtProvider {
                 .claim("email", user.getUserEmail())
                 .claim("name", user.getUserName())
                 .claim("role", user.getUserRole().name())
+                .claim("teamId", teamId)
                 .claim("departmentId", departmentId)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpiry))

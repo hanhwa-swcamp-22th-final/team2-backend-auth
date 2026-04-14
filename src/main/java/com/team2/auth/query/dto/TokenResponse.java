@@ -40,7 +40,16 @@ public class TokenResponse {
         @Schema(description = "사용자 역할", example = "ADMIN")
         private String userRole;
 
-        @Schema(description = "부서명", example = "개발팀")
+        @Schema(description = "팀 ID", example = "1")
+        private Integer teamId;
+
+        @Schema(description = "팀 이름", example = "영업1팀")
+        private String teamName;
+
+        @Schema(description = "부서 ID", example = "1")
+        private Integer departmentId;
+
+        @Schema(description = "부서명", example = "영업부")
         private String departmentName;
 
         @Schema(description = "직급명", example = "과장")

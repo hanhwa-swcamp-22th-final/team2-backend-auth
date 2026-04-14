@@ -41,7 +41,7 @@ public class UserCommandController {
         UserDetailResponse response = UserDetailResponse.from(user);
         EntityModel<UserDetailResponse> model = EntityModel.of(response,
                 linkTo(methodOn(UserQueryController.class).getUser(user.getUserId())).withSelfRel(),
-                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users"));
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, null, 0, 10)).withRel("users"));
         URI location = linkTo(methodOn(UserQueryController.class).getUser(user.getUserId())).toUri();
         return ResponseEntity.created(location).body(model);
     }
@@ -59,7 +59,7 @@ public class UserCommandController {
         User user = userCommandService.updateUser(id, request);
         return ResponseEntity.ok(EntityModel.of(UserDetailResponse.from(user),
                 linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel(),
-                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, 0, 10)).withRel("users")));
+                linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, null, 0, 10)).withRel("users")));
     }
 
     @Operation(summary = "비밀번호 변경", description = "현재 비밀번호를 확인한 후 새 비밀번호로 변경합니다.")

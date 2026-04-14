@@ -2,12 +2,12 @@ package com.team2.auth.command.application.service;
 
 import com.team2.auth.command.application.dto.CreateUserRequest;
 import com.team2.auth.command.application.dto.UpdateUserRequest;
-import com.team2.auth.command.domain.entity.Department;
 import com.team2.auth.command.domain.entity.Position;
+import com.team2.auth.command.domain.entity.Team;
 import com.team2.auth.command.domain.entity.User;
 import com.team2.auth.command.domain.entity.enums.UserStatus;
-import com.team2.auth.command.domain.repository.DepartmentRepository;
 import com.team2.auth.command.domain.repository.PositionRepository;
+import com.team2.auth.command.domain.repository.TeamRepository;
 import com.team2.auth.command.domain.repository.UserRepository;
 import com.team2.auth.query.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 public class UserCommandService {
 
     private final UserRepository userRepository;
-    private final DepartmentRepository departmentRepository;
+    private final TeamRepository teamRepository;
     private final PositionRepository positionRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserQueryService userQueryService;
@@ -68,10 +68,10 @@ public class UserCommandService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         user.updateInfo(request.getName(), request.getEmail());
 
-        if (request.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(request.getDepartmentId())
-                    .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
-            user.assignDepartment(department);
+        if (request.getTeamId() != null) {
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+            user.assignTeam(team);
         }
 
         if (request.getPositionId() != null) {

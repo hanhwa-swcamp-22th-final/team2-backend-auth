@@ -303,7 +303,7 @@ class AuthIntegrationTest {
 
     @Test
     void updateUser_deptNotFound_throwsViaServlet() {
-        UpdateUserRequest req = UpdateUserRequest.builder().departmentId(99999).build();
+        UpdateUserRequest req = UpdateUserRequest.builder().teamId(99999).build();
         assertThrows(ServletException.class, () -> mockMvc.perform(put("/api/users/{id}", savedUser.getUserId())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))));
     }

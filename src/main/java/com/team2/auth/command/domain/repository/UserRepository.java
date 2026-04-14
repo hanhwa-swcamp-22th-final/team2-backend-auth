@@ -20,7 +20,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByEmployeeNo(String employeeNo);
 
-    List<User> findByDepartmentDepartmentId(Integer departmentId);
+    List<User> findByTeamTeamId(Integer teamId);
+
+    List<User> findByTeamDepartmentDepartmentId(Integer departmentId);
 
     List<User> findByUserStatus(UserStatus userStatus);
 

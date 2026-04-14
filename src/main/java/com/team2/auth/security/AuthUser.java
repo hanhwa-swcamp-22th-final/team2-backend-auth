@@ -15,14 +15,17 @@ public class AuthUser implements UserDetails {
     private final String email;
     private final String name;
     private final String role;
+    private final Integer teamId;
     private final Integer departmentId;
     private final List<GrantedAuthority> authorities;
 
-    public AuthUser(Integer userId, String email, String name, String role, Integer departmentId) {
+    public AuthUser(Integer userId, String email, String name, String role,
+                    Integer teamId, Integer departmentId) {
         this.userId = userId;
         this.email = email;
         this.name = name;
         this.role = role;
+        this.teamId = teamId;
         this.departmentId = departmentId;
         this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
     }

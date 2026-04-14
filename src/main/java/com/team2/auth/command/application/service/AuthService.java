@@ -92,13 +92,18 @@ public class AuthService {
     }
 
     private TokenResponse.UserInfo buildUserInfo(User user) {
+        var team = user.getTeam();
+        var dept = user.getDepartment();
         return TokenResponse.UserInfo.builder()
                 .userId(user.getUserId())
                 .employeeNo(user.getEmployeeNo())
                 .userName(user.getUserName())
                 .userEmail(user.getUserEmail())
                 .userRole(user.getUserRole().name())
-                .departmentName(user.getDepartment() != null ? user.getDepartment().getDepartmentName() : null)
+                .teamId(team != null ? team.getTeamId() : null)
+                .teamName(team != null ? team.getTeamName() : null)
+                .departmentId(dept != null ? dept.getDepartmentId() : null)
+                .departmentName(dept != null ? dept.getDepartmentName() : null)
                 .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)
                 .build();
     }

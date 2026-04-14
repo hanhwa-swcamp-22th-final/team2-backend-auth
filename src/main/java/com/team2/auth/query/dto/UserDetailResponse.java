@@ -29,7 +29,16 @@ public class UserDetailResponse {
     @Schema(description = "사용자 역할", example = "USER")
     private String userRole;
 
-    @Schema(description = "부서명", example = "개발팀")
+    @Schema(description = "팀 ID", example = "1")
+    private Integer teamId;
+
+    @Schema(description = "팀 이름", example = "영업1팀")
+    private String teamName;
+
+    @Schema(description = "부서 ID", example = "1")
+    private Integer departmentId;
+
+    @Schema(description = "부서 이름", example = "영업부")
     private String departmentName;
 
     @Schema(description = "직급명", example = "과장")
@@ -51,13 +60,18 @@ public class UserDetailResponse {
     }
 
     public static UserDetailResponse from(User user) {
+        var team = user.getTeam();
+        var dept = user.getDepartment();
         return UserDetailResponse.builder()
                 .userId(user.getUserId())
                 .employeeNo(user.getEmployeeNo())
                 .userName(user.getUserName())
                 .userEmail(user.getUserEmail())
                 .userRole(user.getUserRole() != null ? user.getUserRole().name() : null)
-                .departmentName(user.getDepartment() != null ? user.getDepartment().getDepartmentName() : null)
+                .teamId(team != null ? team.getTeamId() : null)
+                .teamName(team != null ? team.getTeamName() : null)
+                .departmentId(dept != null ? dept.getDepartmentId() : null)
+                .departmentName(dept != null ? dept.getDepartmentName() : null)
                 .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)
                 .position(user.getPosition() != null
                         ? PositionDetail.builder().positionLevel(user.getPosition().getPositionLevel()).build()

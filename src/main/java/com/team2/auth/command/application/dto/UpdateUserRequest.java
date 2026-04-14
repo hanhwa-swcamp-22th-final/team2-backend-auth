@@ -18,8 +18,8 @@ public class UpdateUserRequest {
     @Schema(description = "이메일", example = "hong@example.com")
     private String email;
 
-    @Schema(description = "부서 ID", example = "1")
-    private Integer departmentId;
+    @Schema(description = "팀 ID (팀 → 부서 역참조)", example = "1")
+    private Integer teamId;
 
     @Schema(description = "직급 ID", example = "1")
     private Integer positionId;

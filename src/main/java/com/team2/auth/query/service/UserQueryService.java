@@ -26,6 +26,10 @@ public class UserQueryService {
         return user;
     }
 
+    public List<User> getUsersByTeam(Integer teamId) {
+        return userQueryMapper.findByTeamId(teamId);
+    }
+
     public List<User> getUsersByDepartment(Integer departmentId) {
         return userQueryMapper.findByDepartmentId(departmentId);
     }
@@ -46,14 +50,14 @@ public class UserQueryService {
         return userQueryMapper.findByUserEmail(email);
     }
 
-    public PagedResponse<UserListResponse> getUsers(String userName, Integer departmentId,
+    public PagedResponse<UserListResponse> getUsers(String userName, Integer teamId, Integer departmentId,
                                                      String userRole, String userStatus,
                                                      int page, int size) {
         int offset = page * size;
         List<UserListResponse> content = userQueryMapper.findByCondition(
-                userName, departmentId, userRole, userStatus, size, offset);
+                userName, teamId, departmentId, userRole, userStatus, size, offset);
         long totalElements = userQueryMapper.countByCondition(
-                userName, departmentId, userRole, userStatus);
+                userName, teamId, departmentId, userRole, userStatus);
         return PagedResponse.of(content, totalElements, page, size);
     }
 }
