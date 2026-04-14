@@ -66,6 +66,7 @@ public class SecurityConfig {
                 // /api/**\/internal/** 경로는 InternalApiTokenFilter 가 이미 X-Internal-Token 으로 검증했다.
                 // Gateway 에서는 동일 경로를 denyAll 로 외부 차단하므로 여기서는 permitAll 이 안전하다.
                 .requestMatchers("/api/users/internal/**").permitAll()
+                .requestMatchers("/api/teams/internal/**").permitAll()
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
