@@ -94,6 +94,7 @@ public class AuthService {
     private TokenResponse.UserInfo buildUserInfo(User user) {
         var team = user.getTeam();
         var dept = user.getDepartment();
+        var position = user.getPosition();
         return TokenResponse.UserInfo.builder()
                 .userId(user.getUserId())
                 .employeeNo(user.getEmployeeNo())
@@ -104,7 +105,9 @@ public class AuthService {
                 .teamName(team != null ? team.getTeamName() : null)
                 .departmentId(dept != null ? dept.getDepartmentId() : null)
                 .departmentName(dept != null ? dept.getDepartmentName() : null)
-                .positionName(user.getPosition() != null ? user.getPosition().getPositionName() : null)
+                .positionId(position != null ? position.getPositionId() : null)
+                .positionLevel(position != null ? position.getPositionLevel() : null)
+                .positionName(position != null ? position.getPositionName() : null)
                 .build();
     }
 

@@ -52,6 +52,12 @@ public class TokenResponse {
         @Schema(description = "부서명", example = "영업부")
         private String departmentName;
 
+        @Schema(description = "직급 ID", example = "1")
+        private Integer positionId;
+
+        @Schema(description = "직급 레벨 (1=팀장, 2=팀원)", example = "1")
+        private Integer positionLevel;
+
         @Schema(description = "직급명", example = "과장")
         private String positionName;
     }

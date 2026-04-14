@@ -72,6 +72,8 @@ public class JwtProvider {
         Date now = new Date();
         Integer teamId = user.getTeam() != null ? user.getTeam().getTeamId() : null;
         Integer departmentId = user.getDepartment() != null ? user.getDepartment().getDepartmentId() : null;
+        Integer positionId = user.getPosition() != null ? user.getPosition().getPositionId() : null;
+        Integer positionLevel = user.getPosition() != null ? user.getPosition().getPositionLevel() : null;
         return Jwts.builder()
                 .header().keyId(kid).and()
                 .issuer(issuer)
@@ -81,6 +83,8 @@ public class JwtProvider {
                 .claim("role", user.getUserRole().name())
                 .claim("teamId", teamId)
                 .claim("departmentId", departmentId)
+                .claim("positionId", positionId)
+                .claim("positionLevel", positionLevel)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpiry))
                 .signWith(privateKey, Jwts.SIG.RS256)
