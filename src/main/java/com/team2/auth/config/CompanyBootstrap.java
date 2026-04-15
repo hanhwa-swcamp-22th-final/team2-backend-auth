@@ -32,7 +32,8 @@ public class CompanyBootstrap {
     private static final String DEFAULT_ADDRESS_KR = "서울특별시 중구 청계천로 86";
     private static final String DEFAULT_TEL = "02-729-2700";
     private static final String DEFAULT_FAX = "02-729-2799";
-    private static final String DEFAULT_EMAIL = "contact@hanwha.com";
+    // 실제 SMTP 발신자 (MAIL_USERNAME) 와 일치시켜 PDF/문서 표시·이메일 회신 정합 확보
+    private static final String DEFAULT_EMAIL = "teamsalesboost@gmail.com";
     private static final String DEFAULT_WEBSITE = "https://www.hanwhasolutions.com";
 
     private final CompanyRepository companyRepository;
