@@ -41,4 +41,12 @@ public interface UserQueryMapper {
                           @Param("departmentId") Integer departmentId,
                           @Param("userRole") String userRole,
                           @Param("userStatus") String userStatus);
+
+    /**
+     * 결재자 후보 조회.
+     * - teamId 지정 시: 해당 팀의 팀장(position_level=1) + 전체 ADMIN 사용자
+     * - teamId null: 전체 팀의 팀장 + 전체 ADMIN
+     * active 상태만 반환.
+     */
+    List<UserListResponse> findApprovers(@Param("teamId") Integer teamId);
 }

@@ -59,4 +59,15 @@ public class InternalUserQueryController {
 
         return ResponseEntity.ok(filtered);
     }
+
+    @Operation(
+            summary = "결재자 후보 조회 (내부 전용)",
+            description = "해당 팀의 팀장(position_level=1) + 전체 ADMIN 사용자 반환. teamId 미지정 시 전 팀의 팀장."
+    )
+    @GetMapping("/approvers")
+    public ResponseEntity<List<UserListResponse>> getApprovers(
+            @Parameter(description = "팀 ID (요청자 팀). 미지정 시 전체 팀장")
+            @RequestParam(name = "teamId", required = false) Integer teamId) {
+        return ResponseEntity.ok(userQueryService.getApprovers(teamId));
+    }
 }

@@ -50,6 +50,10 @@ public class UserQueryService {
         return userQueryMapper.findByUserEmail(email);
     }
 
+    public List<UserListResponse> getApprovers(Integer teamId) {
+        return userQueryMapper.findApprovers(teamId);
+    }
+
     public PagedResponse<UserListResponse> getUsers(String userName, Integer teamId, Integer departmentId,
                                                      String userRole, String userStatus,
                                                      int page, int size) {

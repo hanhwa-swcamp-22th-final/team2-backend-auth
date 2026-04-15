@@ -170,6 +170,23 @@
         <include refid="userFilterConditions"/>
     </select>
 
+    <select id="findApprovers" resultType="com.team2.auth.query.dto.UserListResponse">
+        SELECT
+        <include refid="userListColumns"/>
+        <include refid="userJoins"/>
+        WHERE u.user_status = 'active'
+          AND (
+            u.user_role = 'admin'
+            <if test="teamId != null">
+                OR (u.team_id = #{teamId} AND p.position_level = 1)
+            </if>
+            <if test="teamId == null">
+                OR p.position_level = 1
+            </if>
+          )
+        ORDER BY u.user_role = 'admin' DESC, u.user_name ASC
+    </select>
+
     <select id="existsByUserEmail" resultType="int">
         SELECT COUNT(*) FROM users WHERE user_email = #{userEmail}
     </select>
