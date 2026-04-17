@@ -49,6 +49,18 @@ public class UserCommandService {
                 .userStatus(UserStatus.ACTIVE)
                 .build();
 
+        if (request.getTeamId() != null) {
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+            user.assignTeam(team);
+        }
+
+        if (request.getPositionId() != null) {
+            Position position = positionRepository.findById(request.getPositionId())
+                    .orElseThrow(() -> new IllegalArgumentException("직급을 찾을 수 없습니다."));
+            user.assignPosition(position);
+        }
+
         return userRepository.save(user);
     }
 

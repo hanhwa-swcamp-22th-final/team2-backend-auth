@@ -25,4 +25,10 @@ public class CreateUserRequest {
 
     @Schema(description = "사용자 역할", example = "USER")
     private Role role;
+
+    @Schema(description = "팀 ID", example = "1")
+    private Integer teamId;
+
+    @Schema(description = "직급 ID", example = "2")
+    private Integer positionId;
 }
