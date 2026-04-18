@@ -67,4 +67,14 @@ public class UserQueryController {
                 linkTo(methodOn(UserQueryController.class).getUser(id)).withSelfRel(),
                 linkTo(methodOn(UserQueryController.class).getUsers(null, null, null, null, null, 0, 10)).withRel("users")));
     }
+
+    // 내부 전용: Documents → Auth 등 서비스 간 호출용. X-Internal-Token 으로 보호된다.
+    // 사용자 세션 JWT 없이 동작해야 하므로 일반 /{id} (hasRole("ADMIN")) 와 분리.
+    @Operation(summary = "내부 사용자 조회", description = "MSA 내부 호출 전용 (X-Internal-Token 필수). 게이트웨이에서 외부 denyAll.")
+    @GetMapping("/internal/{id}")
+    public UserDetailResponse getUserInternal(
+            @Parameter(description = "사용자 ID") @PathVariable("id") Integer id) {
+        User user = userQueryService.getUser(id);
+        return UserDetailResponse.from(user);
+    }
 }
