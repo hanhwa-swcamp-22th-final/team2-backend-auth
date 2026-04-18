@@ -67,6 +67,8 @@ public class SecurityConfig {
                 // Gateway 에서는 동일 경로를 denyAll 로 외부 차단하므로 여기서는 permitAll 이 안전하다.
                 .requestMatchers("/api/users/internal/**").permitAll()
                 .requestMatchers("/api/teams/internal/**").permitAll()
+                // 뷰어 선택 등 일반 인증 사용자도 접근 가능한 제한 목록 (ADMIN 전용 CRUD 보다 앞)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/viewable").authenticated()
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

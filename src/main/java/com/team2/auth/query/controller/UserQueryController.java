@@ -53,6 +53,18 @@ public class UserQueryController {
         return ResponseEntity.ok(PagedModel.of(models, metadata));
     }
 
+    @Operation(summary = "뷰어 선택용 사용자 목록", description = "인증된 사용자가 기록패키지 뷰어 등에 지정할 수 있는 active 사용자 목록. 최소 정보만 반환.")
+    @GetMapping("/viewable")
+    public ResponseEntity<List<UserListResponse>> getViewableUsers(
+            @Parameter(description = "팀 ID (선택)") @RequestParam(name = "teamId", required = false) Integer teamId,
+            @Parameter(description = "부서 ID (선택)") @RequestParam(name = "departmentId", required = false) Integer departmentId) {
+        PagedResponse<UserListResponse> result = userQueryService.getUsers(
+                null, teamId, departmentId, null, "active", 0, 1000);
+        List<UserListResponse> content = result != null && result.content() != null
+                ? result.content() : List.of();
+        return ResponseEntity.ok(content);
+    }
+
     @Operation(summary = "사용자 상세 조회", description = "사용자 ID로 상세 정보를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),

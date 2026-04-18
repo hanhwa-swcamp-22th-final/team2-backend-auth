@@ -49,4 +49,9 @@ public interface UserQueryMapper {
      * active 상태만 반환.
      */
     List<UserListResponse> findApprovers(@Param("teamId") Integer teamId);
+
+    /**
+     * 팀 소속 active 사용자 ID 만 반환. Documents 서비스가 PI/PO 팀 스코프 필터에 사용.
+     */
+    List<Integer> findUserIdsByTeam(@Param("teamId") Integer teamId);
 }

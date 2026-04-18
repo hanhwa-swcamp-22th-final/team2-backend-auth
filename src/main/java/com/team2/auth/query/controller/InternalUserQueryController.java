@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,5 +70,16 @@ public class InternalUserQueryController {
             @Parameter(description = "팀 ID (요청자 팀). 미지정 시 전체 팀장")
             @RequestParam(name = "teamId", required = false) Integer teamId) {
         return ResponseEntity.ok(userQueryService.getApprovers(teamId));
+    }
+
+    @Operation(
+            summary = "팀 소속 사용자 ID 목록 (내부 전용)",
+            description = "Documents 서비스의 PI/PO 팀 스코프 필터에 사용. active 상태만."
+    )
+    @GetMapping("/team/{teamId}/ids")
+    public ResponseEntity<List<Integer>> getTeamMemberIds(
+            @Parameter(description = "팀 ID", required = true)
+            @PathVariable("teamId") Integer teamId) {
+        return ResponseEntity.ok(userQueryService.findUserIdsByTeam(teamId));
     }
 }

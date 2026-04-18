@@ -54,6 +54,12 @@ public class UserQueryService {
         return userQueryMapper.findApprovers(teamId);
     }
 
+    public List<Integer> findUserIdsByTeam(Integer teamId) {
+        if (teamId == null) return List.of();
+        List<Integer> ids = userQueryMapper.findUserIdsByTeam(teamId);
+        return ids != null ? ids : List.of();
+    }
+
     public PagedResponse<UserListResponse> getUsers(String userName, Integer teamId, Integer departmentId,
                                                      String userRole, String userStatus,
                                                      int page, int size) {

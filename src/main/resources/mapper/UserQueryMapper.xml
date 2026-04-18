@@ -195,4 +195,12 @@
         SELECT COUNT(*) FROM users WHERE employee_no = #{employeeNo}
     </select>
 
+    <select id="findUserIdsByTeam" resultType="java.lang.Integer">
+        SELECT user_id
+          FROM users
+         WHERE team_id = #{teamId}
+           AND user_status = 'active'
+         ORDER BY user_id
+    </select>
+
 </mapper>
