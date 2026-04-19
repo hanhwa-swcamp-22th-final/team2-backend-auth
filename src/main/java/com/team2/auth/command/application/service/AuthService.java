@@ -71,7 +71,13 @@ public class AuthService {
             throw new IllegalStateException("만료된 리프레시 토큰입니다.");
         }
 
-        User user = refreshToken.getUser();
+        // RefreshTokenQueryMapper.findByTokenValue 는 team/position 을 join 하지 않고
+        // User 를 재구성한다. 그대로 JwtProvider.generateAccessToken 에 넘기면
+        // team/position 이 null 이라 teamId/departmentId/positionId/positionLevel
+        // 클레임이 전부 null → JJWT 가 null claim 을 드롭하면서 refresh 토큰에서
+        // 구조 클레임이 사라진다(SALES 계정의 팀 스코프 필터가 0건이 되던 원인).
+        // login 경로처럼 UserQueryMapper.findById 로 다시 로드해 full-join User 확보.
+        User user = userQueryService.getUser(refreshToken.getUser().getUserId());
         String newAccessToken = jwtProvider.generateAccessToken(user);
         String newRefreshTokenValue = jwtProvider.generateRefreshToken();
 
