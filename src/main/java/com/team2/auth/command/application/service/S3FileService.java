@@ -17,9 +17,11 @@ public class S3FileService {
 
     private final S3Client s3Client;
 
-    // TODO: application.yml에 실제 버킷명 설정 필요
     @Value("${cloud.aws.s3.bucket:team2-bucket}")
     private String bucket;
+
+    @Value("${cloud.aws.s3.public-url-prefix:}")
+    private String publicUrlPrefix;
 
     public String upload(String directory, MultipartFile file) {
         String key = directory + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -36,7 +38,9 @@ public class S3FileService {
             throw new RuntimeException("파일 업로드에 실패했습니다.", e);
         }
 
-        // TODO: CloudFront 도메인 또는 S3 퍼블릭 URL로 변경 필요
-        return "https://" + bucket + ".s3.amazonaws.com/" + key;
+        String prefix = publicUrlPrefix.isBlank()
+                ? "https://" + bucket + ".s3.amazonaws.com"
+                : publicUrlPrefix;
+        return prefix + "/" + key;
     }
 }

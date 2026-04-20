@@ -50,6 +50,7 @@ cloud:
       static: ${AWS_REGION:ap-northeast-2}
     s3:
       bucket: ${AWS_S3_BUCKET:team2-bucket}
+      public-url-prefix: ${AWS_S3_PUBLIC_URL_PREFIX:}
 
 jwt:
   rsa:
