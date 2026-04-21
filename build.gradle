@@ -58,6 +58,10 @@ dependencies {
 
     // AWS S3
     implementation 'software.amazon.awssdk:s3:2.31.1'
+    // IRSA (EKS ServiceAccount → IAM Role) 는 WebIdentityTokenFileCredentialsProvider 가 필요하고,
+    // 이 Provider 는 awssdk 의 sts 모듈에서 제공된다. s3 만 의존으로 두면 기본 credential chain 이
+    // 해당 provider 를 skip 하고 EC2 IMDS(= 노드 role)로 fallback → S3 403.
+    implementation 'software.amazon.awssdk:sts:2.31.1'
 
     // JWKS serialization
     implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
