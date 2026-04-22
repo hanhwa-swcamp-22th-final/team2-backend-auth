@@ -18,15 +18,31 @@
     </select>
 
     <select id="findAll" resultMap="positionResultMap">
-        SELECT position_id, position_name, position_level, created_at
+        SELECT
+            MIN(position_id) AS position_id,
+            position_name,
+            CASE position_name
+                WHEN '팀장' THEN 1
+                WHEN '팀원' THEN 3
+                ELSE MIN(position_level)
+            END AS position_level,
+            MIN(created_at) AS created_at
         FROM positions
-        ORDER BY position_id
+        WHERE position_name IN ('팀장', '팀원')
+        GROUP BY position_name
+        ORDER BY CASE position_name
+            WHEN '팀장' THEN 1
+            WHEN '팀원' THEN 2
+            ELSE 99
+        END
     </select>
 
     <select id="findByPositionName" resultMap="positionResultMap">
         SELECT position_id, position_name, position_level, created_at
         FROM positions
         WHERE position_name = #{positionName}
+        ORDER BY position_id
+        LIMIT 1
     </select>
 
 </mapper>

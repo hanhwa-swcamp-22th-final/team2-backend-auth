@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class PositionCommandController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (중복된 직급명 등)")
     })
     @PostMapping
-    public ResponseEntity<EntityModel<Position>> createPosition(@RequestBody CreatePositionRequest request) {
+    public ResponseEntity<EntityModel<Position>> createPosition(@Valid @RequestBody CreatePositionRequest request) {
         Position position = positionCommandService.createPosition(request.getName(), request.getLevel());
         EntityModel<Position> model = EntityModel.of(position,
                 linkTo(methodOn(PositionQueryController.class).getAllPositions()).withRel("positions"));
@@ -50,7 +51,7 @@ public class PositionCommandController {
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<Position>> updatePosition(
             @Parameter(description = "직급 ID") @PathVariable("id") Integer id,
-            @RequestBody UpdatePositionRequest request) {
+            @Valid @RequestBody UpdatePositionRequest request) {
         Position position = positionCommandService.updatePosition(id, request.getName(), request.getLevel());
         return ResponseEntity.ok(EntityModel.of(position,
                 linkTo(methodOn(PositionQueryController.class).getAllPositions()).withRel("positions")));

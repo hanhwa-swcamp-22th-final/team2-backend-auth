@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "positions")
+@Table(
+        name = "positions",
+        uniqueConstraints = @UniqueConstraint(name = "uk_position_name", columnNames = "position_name")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Position {

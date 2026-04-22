@@ -19,8 +19,12 @@ INSERT IGNORE INTO teams (team_id, team_name, department_id, created_at) VALUES 
 INSERT IGNORE INTO teams (team_id, team_name, department_id, created_at) VALUES (8, '경영지원2팀', 4, NOW());
 
 -- 직급 (level 1 = 결재 권한 있음 / 3 = 일반 팀원). seed_dml.sql 과 동일 규칙.
-INSERT IGNORE INTO positions (position_name, position_level, created_at) VALUES ('팀장', 1, NOW());
-INSERT IGNORE INTO positions (position_name, position_level, created_at) VALUES ('팀원', 3, NOW());
+INSERT INTO positions (position_id, position_name, position_level, created_at) VALUES
+    (1, '팀장', 1, NOW()),
+    (2, '팀원', 3, NOW())
+ON DUPLICATE KEY UPDATE
+    position_name = VALUES(position_name),
+    position_level = VALUES(position_level);
 
 -- 사용자 (비밀번호: password123 -> BCrypt 해시)
 -- 사번 형식: YYMMDDNN (입사일+순번)

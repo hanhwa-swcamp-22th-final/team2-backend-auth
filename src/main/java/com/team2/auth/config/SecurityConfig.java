@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -68,7 +69,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/internal/**").permitAll()
                 .requestMatchers("/api/teams/internal/**").permitAll()
                 // 뷰어 선택 등 일반 인증 사용자도 접근 가능한 제한 목록 (ADMIN 전용 CRUD 보다 앞)
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/viewable").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/users/viewable").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/positions/**", "/api/departments/**", "/api/teams/**", "/api/company/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/positions/**", "/api/departments/**", "/api/teams/**", "/api/company/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/positions/**", "/api/departments/**", "/api/teams/**", "/api/company/**").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

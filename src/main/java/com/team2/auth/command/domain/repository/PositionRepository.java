@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface PositionRepository extends JpaRepository<Position, Integer> {
 
     Optional<Position> findByPositionName(String positionName);
+
+    Optional<Position> findFirstByPositionNameOrderByPositionIdAsc(String positionName);
 }
