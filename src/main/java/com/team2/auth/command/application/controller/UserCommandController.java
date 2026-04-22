@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class UserCommandController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (중복 이메일, 필수 항목 누락 등)")
     })
     @PostMapping
-    public ResponseEntity<EntityModel<UserDetailResponse>> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<EntityModel<UserDetailResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
         User user = userCommandService.createUser(request);
         UserDetailResponse response = UserDetailResponse.from(user);
         EntityModel<UserDetailResponse> model = EntityModel.of(response,

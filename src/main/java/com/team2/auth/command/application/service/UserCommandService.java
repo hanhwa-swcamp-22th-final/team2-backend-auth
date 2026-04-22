@@ -34,7 +34,21 @@ public class UserCommandService {
     private final EmailService emailService;
 
     public User createUser(CreateUserRequest request) {
-        if (userQueryService.existsByUserEmail(request.getEmail())) {
+        String name = normalizeRequired(request.getName(), "이름을 입력해주세요.");
+        String email = normalizeRequired(request.getEmail(), "이메일을 입력해주세요.");
+        String password = normalizeRequired(request.getPassword(), "비밀번호를 입력해주세요.");
+
+        if (request.getRole() == null) {
+            throw new IllegalArgumentException("사용자 권한을 확인해주세요.");
+        }
+        if (request.getTeamId() == null) {
+            throw new IllegalArgumentException("팀을 선택해주세요.");
+        }
+        if (request.getPositionId() == null) {
+            throw new IllegalArgumentException("직급을 선택해주세요.");
+        }
+
+        if (userQueryService.existsByUserEmail(email)) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
@@ -42,26 +56,29 @@ public class UserCommandService {
 
         User user = User.builder()
                 .employeeNo(employeeNo)
-                .userName(request.getName())
-                .userEmail(request.getEmail())
-                .userPw(passwordEncoder.encode(request.getPassword()))
+                .userName(name)
+                .userEmail(email)
+                .userPw(passwordEncoder.encode(password))
                 .userRole(request.getRole())
                 .userStatus(UserStatus.ACTIVE)
                 .build();
 
-        if (request.getTeamId() != null) {
-            Team team = teamRepository.findById(request.getTeamId())
-                    .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
-            user.assignTeam(team);
-        }
+        Team team = teamRepository.findById(request.getTeamId())
+                .orElseThrow(() -> new IllegalArgumentException("팀을 찾을 수 없습니다."));
+        user.assignTeam(team);
 
-        if (request.getPositionId() != null) {
-            Position position = positionRepository.findById(request.getPositionId())
-                    .orElseThrow(() -> new IllegalArgumentException("직급을 찾을 수 없습니다."));
-            user.assignPosition(position);
-        }
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElseThrow(() -> new IllegalArgumentException("직급을 찾을 수 없습니다."));
+        user.assignPosition(position);
 
         return userRepository.save(user);
+    }
+
+    private String normalizeRequired(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value.trim();
     }
 
     private String generateEmployeeNo() {
@@ -106,7 +123,7 @@ public class UserCommandService {
         user.changePassword(passwordEncoder.encode(newPw));
     }
 
-    private static final String DEFAULT_RESET_PASSWORD = "test1234";
+    private static final String DEFAULT_RESET_PASSWORD = "password123";
 
     public void resetPassword(Integer id) {
         User user = userRepository.findById(id)

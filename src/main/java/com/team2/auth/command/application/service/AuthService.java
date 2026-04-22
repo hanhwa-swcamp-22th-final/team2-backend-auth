@@ -9,6 +9,7 @@ import com.team2.auth.command.domain.repository.RefreshTokenRepository;
 import com.team2.auth.command.domain.repository.UserRepository;
 import com.team2.auth.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +32,11 @@ public class AuthService {
     public TokenResponse login(String email, String password) {
         User user = userQueryService.getUserByEmail(email);
         if (user == null) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+            throw new BadCredentialsException("사용자를 찾을 수 없습니다.");
         }
 
         if (!passwordEncoder.matches(password, user.getUserPw())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
         if (!user.canLogin()) {
@@ -63,12 +64,12 @@ public class AuthService {
     public TokenResponse refreshToken(String token) {
         RefreshToken refreshToken = refreshTokenQueryMapper.findByTokenValue(token);
         if (refreshToken == null) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new BadCredentialsException("유효하지 않은 리프레시 토큰입니다.");
         }
 
         if (refreshToken.isExpired()) {
             refreshTokenRepository.delete(refreshToken);
-            throw new IllegalStateException("만료된 리프레시 토큰입니다.");
+            throw new BadCredentialsException("만료된 리프레시 토큰입니다.");
         }
 
         // RefreshTokenQueryMapper.findByTokenValue 는 team/position 을 join 하지 않고
